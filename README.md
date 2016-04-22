@@ -1,0 +1,2 @@
+# gom
+God Of Money
