@@ -164,5 +164,7 @@
 #define ERR_FILE_STRINGRESIZE_ERROR                5028   // new MQL4
 #define ERR_FILE_STRUCT_WITH_OBJECTS               5029   // new MQL4
 
+#define ERR_UNKONW_MARKET                          6000   //unkonw market
+#define ERR_ERROR_FOREX_FILEPATH                   6001   //filename error for forex csv data
 
 #endif //STDERROR_MQL4_H

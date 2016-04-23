@@ -31,7 +31,8 @@ typedef double DEEP_PRICE[MAX_DEEP_PRICE];
 typedef ulong  DEEP_VOLUME[MAX_DEEP_PRICE];
 
 //mql4
-enum ENUM_TIMEFRAMES {
+typedef enum ENUM_TIMEFRAMES {
+    PERIOD_TICK     = -1,
     PERIOD_CURRENT  = 0 , //Current timeframe
     PERIOD_M1   =  1    , //1 minute
     PERIOD_M5   =  5    , //5 minutes
@@ -54,7 +55,7 @@ enum ENUM_TIMEFRAMES {
     PERIOD_H6   =  360  , //6 hours
     PERIOD_H8   =  480  , //8 hours
     PERIOD_H12  =  720  , //12 hours
-};
+} ENUM_TIMEFRAMES;
 
 //mql4
 //https://docs.mql4.com/constants/objectconstants/visible
@@ -172,6 +173,13 @@ enum ENUM_MA_METHOD {
 #define Blue   0x00ff0000
 #define Violet 0x00ee82ee
 
+
+#define CHAR_PATH_SPERATOR '/'
+
+#ifdef __cplusplus
+extern "C" {
+#endif //__cplusplus
+
 //mql5
 struct MqlParam
 {
@@ -227,15 +235,21 @@ typedef struct TickData {
     SYMBOL_NAME symbol;  //
     ulong       amount;
     MqlTick*      data;
-}TickData;
+} TickData;
 
 ///this structure stores series of one rates
 typedef struct RatesData {
     MARKETID    market;
     SYMBOL_NAME symbol;
+    ENUM_TIMEFRAMES et;
     ulong       amount;
     MqlRates*     data;
-}RatesData;
+} RatesData;
+
+#ifdef __cplusplus
+} //extern "C"
+#endif //__cplusplus
+
 
 } //namespace MQL4
 
