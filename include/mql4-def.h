@@ -6,7 +6,7 @@
 #include "stderror-mql4.h"
 #include "StdLibErr.h"
 #include <string>
-
+#include <vector>
 
 using namespace std;
 
@@ -229,12 +229,15 @@ typedef struct MqlTick
     DEEP_VOLUME  ask_volume;
 } MqlTick ;
 
+
+typedef std::vector<MqlRates> RatesVector;
+typedef std::vector<MqlTick>  TickVector;
+
 ///this structure stores infoamtion about the series of one symbol
 typedef struct TickData {
     MARKETID    market;  //market id
     SYMBOL_NAME symbol;  //
-    ulong       amount;
-    MqlTick*      data;
+    TickVector    data;
 } TickData;
 
 ///this structure stores series of one rates
@@ -242,8 +245,7 @@ typedef struct RatesData {
     MARKETID    market;
     SYMBOL_NAME symbol;
     ENUM_TIMEFRAMES et;
-    ulong       amount;
-    MqlRates*     data;
+    RatesVector   data;
 } RatesData;
 
 #ifdef __cplusplus

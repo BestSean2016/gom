@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 #include "mql4-def.h"
 

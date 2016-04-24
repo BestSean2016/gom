@@ -8,16 +8,13 @@ INCLUDEPATH += ../include
 
 SOURCES += datagen.cpp \
     ../libgom/getopt.cpp \
-    ../libgom/randomwalk.cpp
+    ../libgom/randomwalk.cpp \
+    ../libgom/datetime.cpp
 
 HEADERS += \
-    includes/stderror-mql4.h \
-    includes/mql4-def.h \
-    include/mql4-def.h \
-    include/stderror-mql4.h \
-    include/StdLibErr.h \
     ../include/StdLibErr.h \
     ../include/mql4-def.h \
     ../include/stderror-mql4.h \
-    ../include/libgom.h
+    ../include/libgom.h \
+    ../include/datetime.h
 

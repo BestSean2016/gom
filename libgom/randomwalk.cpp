@@ -2,7 +2,7 @@
 
 namespace MQL4 {
 
-static int get_forex_furtures(RatesData &rd, string& symbol_full) {
+static int get_forex_furtures(RatesData &rd, string& symbol_full, const char* csvfile) {
     //get symbol and period
     size_t i = 0;
     while(!isdigit(symbol_full[i++]));
@@ -10,9 +10,14 @@ static int get_forex_furtures(RatesData &rd, string& symbol_full) {
     --i;
     symbol_full.copy(rd.symbol, i, 0);
     rd.et = (ENUM_TIMEFRAMES)atoi(symbol_full.substr(i, symbol_full.length() - i).c_str());
-    //check the rd.et is valid
+
+    //
+    //TO DO: check the rd.et is valid
+    //
 
     //read data
+    std::ifstream fin(csvfile);
+
 
     //cout << rd.et << ',' << rd.symbol << endl;
     return (0);
@@ -28,7 +33,7 @@ int read_forex_csv(RatesData &rd, MARKETID market, const char* csvfile) {
     int result = ERR_UNKONW_MARKET;
     switch((int)market) {
     case MARKET_FOREX_FURTURES:
-        result = get_forex_furtures(rd, symbol_full);
+        result = get_forex_furtures(rd, symbol_full, csvfile);
         break;
     }
 
