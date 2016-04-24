@@ -176,9 +176,6 @@ enum ENUM_MA_METHOD {
 
 #define CHAR_PATH_SPERATOR '/'
 
-#ifdef __cplusplus
-extern "C" {
-#endif //__cplusplus
 
 //mql5
 struct MqlParam
@@ -217,6 +214,7 @@ typedef struct MqlRates
     ulong    real_volume;  // Trade volume
 } MqlRates;
 
+
 //This is a structure for storing the latest prices of the symbol. It is designed for fast retrieval of the most requested information about current prices.
 typedef struct MqlTick
 {
@@ -242,17 +240,17 @@ typedef struct TickData {
 
 ///this structure stores series of one rates
 typedef struct RatesData {
-    MARKETID    market;
-    SYMBOL_NAME symbol;
-    ENUM_TIMEFRAMES et;
-    RatesVector   data;
+    MARKETID        market;
+    SYMBOL_NAME     symbol;
+    ENUM_TIMEFRAMES period;
+    RatesVector       data;
 } RatesData;
-
-#ifdef __cplusplus
-} //extern "C"
-#endif //__cplusplus
 
 
 } //namespace MQL4
+
+extern bool operator== (MQL4::MqlRates& r1, MQL4::MqlRates& r2);
+extern bool operator== (MQL4::MqlRates& r , MQL4::MqlTick& t);
+
 
 #endif // MQL4DEF_H

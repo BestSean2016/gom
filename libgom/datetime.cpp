@@ -1,3 +1,4 @@
+#include <cstring>
 #include "datetime.h"
 
 namespace MQL4 {
@@ -32,14 +33,28 @@ datetime  StringToTime(const char* value) {
     return (0);
 }
 
-//
+//forex
 //date,      time, open,   high,   low,    close,  volume
 //2016.04.08,16:22,108.600,108.601,108.551,108.555,86
 //
 datetime ForexStringToTime(const string& value) {
-    struct tm tt;
+    return ForexStringToTime(value.c_str());
+}
 
-
+datetime ForexStringToTime(const char* value) {
+    char* str = (char*)value;
+    struct tm lt;
+    memset(&lt, 0, sizeof(lt));
+    lt.tm_year = atoi(str) - 1900;
+    str += 5;   //str = strchr(str, '.') + 1;
+    lt.tm_mon = atoi(str) - 1;
+    str += 3;   //str = strchr(str, '.') + 1;
+    lt.tm_mday = atoi(str);
+    str += 3;   //str = strchr(str, ',') + 1;
+    lt.tm_hour = atoi(str);
+    str += 3;   //str = strchr(str, ':') + 1;
+    lt.tm_min = atoi(str);
+    return mktime(&lt);
 }
 
 } //namespace MQL4

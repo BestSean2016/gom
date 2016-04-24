@@ -166,5 +166,6 @@
 
 #define ERR_UNKONW_MARKET                          6000   //unkonw market
 #define ERR_ERROR_FOREX_FILEPATH                   6001   //filename error for forex csv data
+#define ERR_NO_ENOGHT_FOREX_DATA_IN_LINE           6002   //ERR_NO_ENOGHT_FOREX_DATA_IN_LINE
 
 #endif //STDERROR_MQL4_H

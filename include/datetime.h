@@ -107,6 +107,7 @@ extern datetime  StringToTime(
  * @return value of datetime
  */
 extern datetime ForexStringToTime(const string &value);
+extern datetime ForexStringToTime(const char* value);
 
 } //namespace MQL4
 
