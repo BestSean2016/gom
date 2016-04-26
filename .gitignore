@@ -73,4 +73,6 @@ Thumbs.db
 
 ./build
 ./build/*
+!build/
+*.pro.user
 
