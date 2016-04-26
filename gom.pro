@@ -2,4 +2,5 @@ TEMPLATE = subdirs
 
 SUBDIRS = \
     datagen \
-    unit-test
+    unit-test \
+    mql4_strategy

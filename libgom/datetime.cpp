@@ -30,6 +30,7 @@ datetime  StringToTime(const string& value) {
 }
 
 datetime  StringToTime(const char* value) {
+    (void)value;
     return (0);
 }
 

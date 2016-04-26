@@ -9,12 +9,29 @@ INCLUDEPATH += ../include
 SOURCES += datagen.cpp \
     ../libgom/getopt.cpp \
     ../libgom/randomwalk.cpp \
-    ../libgom/datetime.cpp
+    ../libgom/datetime.cpp \
+    ../libgom/indicator.cpp \
+    ../libgom/stdlib-mql4.cpp \
+    ../libgom/AccountInfo.cpp \
+    ../libgom/Checkup.cpp \
+    ../libgom/Conversion.cpp \
+    ../libgom/Math.cpp \
+    ../libgom/string-ops.cpp \
+    ../libgom/TimeSeries.cpp \
+    ../libgom/Trading.cpp
 
 HEADERS += \
     ../include/StdLibErr.h \
     ../include/mql4-def.h \
     ../include/stderror-mql4.h \
     ../include/libgom.h \
-    ../include/datetime.h
+    ../include/datetime.h \
+    ../include/AccountInfo.h \
+    ../include/Checkup.h \
+    ../include/Conversion.h \
+    ../include/Math.h \
+    ../include/stdlib-mql4.h \
+    ../include/string-ops.h \
+    ../include/Tradeing.h \
+    ../include/indicator.h
 
