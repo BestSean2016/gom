@@ -214,6 +214,16 @@ typedef struct MqlRates
 } MqlRates;
 
 
+typedef struct RatesSerial {
+    ulong      amount;
+    datetime * time;         // Period start time
+    double   * open;         // Open price
+    double   * high;         // The highest price of the period
+    double   * low;          // The lowest price of the period
+    double   * close;        // Close price
+    ulong    * tick_volume;  // Tick volume
+} RatesSerial;
+
 //This is a structure for storing the latest prices of the symbol. It is designed for fast retrieval of the most requested information about current prices.
 typedef struct MqlTick
 {
@@ -243,8 +253,10 @@ typedef struct RatesData {
     SYMBOL_NAME     symbol;
     ENUM_TIMEFRAMES period;
     RatesVector       data;
+    RatesSerial*        rs;
 } RatesData;
 
+void addRateData(RatesData& rd, MqlRates& rate)
 
 } //namespace MQL4
 
