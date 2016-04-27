@@ -5,6 +5,7 @@
 //+------------------------------------------------------------------+
 #include "stderror-mql4.h"
 #include "stdlib-mql4.h"
+#include "indicator.h"
 
 #define copyright   "2005-2014, MetaQuotes Software Corp."
 #define link        "http://www.mql4.com"
@@ -58,8 +59,8 @@ void OnTick(void)
    MacdPrevious=iMACD(NULL,0,12,26,9,PRICE_CLOSE,MODE_MAIN,1);
    SignalCurrent=iMACD(NULL,0,12,26,9,PRICE_CLOSE,MODE_SIGNAL,0);
    SignalPrevious=iMACD(NULL,0,12,26,9,PRICE_CLOSE,MODE_SIGNAL,1);
-   MaCurrent=iMA(NULL,0,MATrendPeriod,0,MODE_EMA,PRICE_CLOSE,0);
-   MaPrevious=iMA(NULL,0,MATrendPeriod,0,MODE_EMA,PRICE_CLOSE,1);
+   MaCurrent=iMA(NULL,PERIOD_CURRENT,MATrendPeriod,0,MODE_EMA,PRICE_CLOSE,0);
+   MaPrevious=iMA(NULL,PERIOD_CURRENT,MATrendPeriod,0,MODE_EMA,PRICE_CLOSE,1);
 
    total=OrdersTotal();
    if(total<1)

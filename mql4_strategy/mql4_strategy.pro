@@ -6,7 +6,19 @@ CONFIG -= qt
 INCLUDEPATH += ../include
 
 SOURCES += main.cpp \
-    MACD_Sample.cpp
+    MACD_Sample.cpp \
+    ../libgom/AccountInfo.cpp \
+    ../libgom/Checkup.cpp \
+    ../libgom/Conversion.cpp \
+    ../libgom/datetime.cpp \
+    ../libgom/getopt.cpp \
+    ../libgom/indicator.cpp \
+    ../libgom/Math.cpp \
+    ../libgom/randomwalk.cpp \
+    ../libgom/stdlib-mql4.cpp \
+    ../libgom/string-ops.cpp \
+    ../libgom/TimeSeries.cpp \
+    ../libgom/Trading.cpp
 
 HEADERS += \
     ../include/datetime.h \
@@ -19,5 +31,6 @@ HEADERS += \
     ../include/Conversion.h \
     ../include/Math.h \
     ../include/string-ops.h \
-    ../include/Tradeing.h
+    ../include/Tradeing.h \
+    ../include/indicator.h
 

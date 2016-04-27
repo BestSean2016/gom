@@ -1,4 +1,3 @@
-#include "mql4-def.h"
 #include "indicator.h"
 
 
@@ -25,5 +24,17 @@ double  iMA(
     return (0);
 }
 
+double  iMACD(
+   string       symbol,           // symbol
+   int          timeframe,        // timeframe
+   int          fast_ema_period,  // Fast EMA period
+   int          slow_ema_period,  // Slow EMA period
+   int          signal_period,    // Signal line period
+   int          applied_price,    // applied price
+   int          mode,             // line index
+   int          shift             // shift
+   ) {
+    return (0);
+}
 
 } //namespace MQL4

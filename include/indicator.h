@@ -1,6 +1,7 @@
 #ifndef INDICATOR_H
 #define INDICATOR_H
 #include <string>
+#include "mql4-def.h"
 
 using namespace std;
 
@@ -47,6 +48,37 @@ double  iMA(
    int             applied_price,    // applied price
    int             shift             // shift
    );
+
+
+/**
+ * @brief iMACD Calculates the Moving Averages Convergence/Divergence indicator and returns its value.
+ * Note
+ * In some systems it is called MACD Histogram and plotted as two lines. In MetaTrader 4 client terminal MACD is plotted as histogram.
+ * Example:
+ *   if(iMACD(NULL,0,12,26,9,PRICE_CLOSE,MODE_MAIN,0)>iMACD(NULL,0,12,26,9,PRICE_CLOSE,MODE_SIGNAL,0)) return(0);
+ *
+ * @param symbol [in]  Symbol name on the data of which the indicator will be calculated. NULL means the current symbol.
+ * @param timeframe [in]  Timeframe. It can be any of ENUM_TIMEFRAMES enumeration values. 0 means the current chart timeframe.
+ * @param fast_ema_period [in]  Fast EMA averaging period.
+ * @param slow_ema_period [in]  Slow EMA averaging period.
+ * @param signal_period [in]  Signal line averaging period.
+ * @param applied_price [in]  Applied price. It can be any of ENUM_APPLIED_PRICE enumeration values.
+ * @param mode [in]  Indicator line index. It can be one of the Indicators line identifiers enumeration values (0-MODE_MAIN, 1-MODE_SIGNAL).
+ * @param shift [in]  Index of the value taken from the indicator buffer (shift relative to the current bar the given amount of periods ago).
+ * @return Numerical value of the Moving Average of Oscillator indicator.
+ */
+
+double  iMACD(
+   string       symbol,           // symbol
+   int          timeframe,        // timeframe
+   int          fast_ema_period,  // Fast EMA period
+   int          slow_ema_period,  // Slow EMA period
+   int          signal_period,    // Signal line period
+   int          applied_price,    // applied price
+   int          mode,             // line index
+   int          shift             // shift
+   );
+
 
 
 } //namespace MQL4
