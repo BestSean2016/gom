@@ -105,4 +105,12 @@ int reates_to_tick(RatesData& rd, TickData& td) {
     return (0);
 }
 
+int serializateRates(RateData& rd, uint newDataAmount) {
+    return (0);
+}
+
+int addRateData(RatesData& rd, MqlRates& rate) {
+    return (0);
+}
+
 } //namespace MQL4

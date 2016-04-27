@@ -256,7 +256,21 @@ typedef struct RatesData {
     RatesSerial*        rs;
 } RatesData;
 
-void addRateData(RatesData& rd, MqlRates& rate)
+/**
+ * @brief serializateRates serializate rates data
+ * @param rd the ratesdata
+ * @param newDataAmount reserved size of buffer of serializated
+ * @return the result code, zero for succeed
+ */
+int serializateRates(RateData& rd, uint newDataAmount);
+
+/**
+ * @brief addRateData add a new RatesData
+ * @param rd
+ * @param rate
+ */
+int addRateData(RatesData& rd, MqlRates& rate);
+void releaseRates(RateData& rd);
 
 } //namespace MQL4
 
