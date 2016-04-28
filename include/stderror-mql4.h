@@ -180,5 +180,6 @@
 #define ERR_ERROR_FOREX_FILEPATH                   6001   //filename error for forex csv data
 #define ERR_NO_ENOGHT_FOREX_DATA_IN_LINE           6002   //ERR_NO_ENOGHT_FOREX_DATA_IN_LINE
 #define ERR_OUT_OF_BUFFER                          6003   // ERR_OUT_OF_BUFFER
+#define ERR_WRONG_PATH                             6004
 
 #endif //STDERROR_MQL4_H

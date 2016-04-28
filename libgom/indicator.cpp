@@ -8,7 +8,8 @@ int  iBars(
    string           symbol,          // symbol
    ENUM_TIMEFRAMES  timeframe        // timeframe
    ) {
-    return (0);
+    RatesData& rates = getSymbol(MARKET_FOREX_FURTURES, symbol, timeframe);
+    return static_cast<int>(rates.rs.amount);
 }
 
 

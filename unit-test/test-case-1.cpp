@@ -34,7 +34,7 @@ TEST_CASE( "read_forex_csv", "DataAdaptor") {
                    "/home/sean/projects/quants/gom/data/USDJPY1.csv");
     REQUIRE(result == 0);
     REQUIRE(rd.symbol.market == MQL4::MARKET_FOREX_FURTURES);
-    REQUIRE(rd.symbol.symbol == string("USDJPY"));
+    REQUIRE(rd.symbol.symbol_name == string("USDJPY"));
     REQUIRE(rd.symbol.period == MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
     REQUIRE(rd.data.size() == 13455);
 
@@ -100,20 +100,42 @@ TEST_CASE( "serialization of forex rates", "serialization") {
                 MQL4::MARKET_FOREX_FURTURES,
                 "/home/sean/projects/quants/gom/data/USDJPY1.csv");
     REQUIRE(result == 0);
+    REQUIRE(rd.symbol.market == MQL4::MARKET_FOREX_FURTURES);
+    REQUIRE(rd.symbol.symbol_name == string("USDJPY"));
+    REQUIRE(rd.symbol.period == MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
+    REQUIRE(rd.data.size() == 13455);
 
     result = MQL4::serializateRates(rd, rd.data.size());
     REQUIRE(result == 0);
-    REQUIRE(rd.rs->size == rd.data.size() * 2);
-    REQUIRE(rd.rs->amount == rd.data.size());
+    REQUIRE(rd.rs.size == rd.data.size() * 2);
+    REQUIRE(rd.rs.amount == rd.data.size());
 
     for (size_t i = 0; i < rd.data.size(); ++i) {
-        bool t = (rd.data[i].open == rd.rs->open[i]
-             && rd.data[i].close == rd.rs->close[i]
-             && rd.data[i].open == rd.rs->open[i]
-             && rd.data[i].high == rd.rs->high[i]
-             && rd.data[i].low == rd.rs->low[i]
-             && rd.data[i].time == rd.rs->time[i]
-             && rd.data[i].tick_volume == rd.rs->tick_volume[i]);
+        bool t = (rd.data[i].open == rd.rs.open[i]
+             && rd.data[i].close  == rd.rs.close[i]
+             && rd.data[i].open   == rd.rs.open[i]
+             && rd.data[i].high   == rd.rs.high[i]
+             && rd.data[i].low    == rd.rs.low[i]
+             && rd.data[i].time   == rd.rs.time[i]
+             && rd.data[i].tick_volume == rd.rs.tick_volume[i]);
         REQUIRE(t);
     }
+
+    MQL4::releaseRates(rd);
+    REQUIRE(rd.rs.time == 0);
+    REQUIRE(rd.data.size() == 0);
+    REQUIRE(rd.rs.amount == 0);
 }
+
+TEST_CASE( "get_forex_data from path", "get_forex_data") {
+    int result = MQL4::get_forex_data("/home/sean/projects/quants/gom/data");
+    REQUIRE(result == 0);
+
+    std::string symbol_name("USDJPY");
+    MQL4::RatesData& rd = MQL4::getSymbol(MQL4::MARKET_FOREX_FURTURES, symbol_name, MQL4::PERIOD_M1);
+    REQUIRE(rd.symbol.market == MQL4::MARKET_FOREX_FURTURES);
+    REQUIRE(rd.symbol.symbol_name == string("USDJPY"));
+    REQUIRE(rd.symbol.period == MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
+    REQUIRE(rd.data.size() == 13455);
+}
+

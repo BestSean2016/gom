@@ -1,5 +1,9 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h>
+#include <unistd.h>
+
 #include "libgom.h"
 
 
@@ -62,8 +66,7 @@ static int get_forex_furtures(RatesData &rd, const char* csvfile) {
     if (i == symbol_full.length()) return ERR_ERROR_FOREX_FILEPATH;
 
     rd.symbol.market = MARKET_FOREX_FURTURES;
-    symbol_full.copy(rd.symbol.symbol_name, i);
-    rd.symbol.symbol_name[i] = 0;
+    rd.symbol.symbol_name = symbol_full.substr(0, i);
     rd.symbol.period = (ENUM_TIMEFRAMES)atoi(symbol_full.substr(i, symbol_full.length() - i).c_str());
 
     //
@@ -84,7 +87,6 @@ static int get_forex_furtures(RatesData &rd, const char* csvfile) {
 }
 
 int read_forex_csv(RatesData &rd, MARKETID market, const char* csvfile) {
-
     int result = ERR_UNKONW_MARKET;
     switch((int)market) {
     case MARKET_FOREX_FURTURES:
@@ -95,8 +97,40 @@ int read_forex_csv(RatesData &rd, MARKETID market, const char* csvfile) {
     return result;
 }
 
+int get_forex_data(const char* path) {
+    DIR *dir;
+    struct dirent *ptr;
+    char base[1000];
+
+    if ((dir=opendir(path)) == NULL)
+        return ERR_WRONG_PATH;
+
+    while ((ptr=readdir(dir)) != NULL) {
+        if(strcmp(ptr->d_name,".")==0 || strcmp(ptr->d_name,"..")==0)    ///current dir OR parrent dir
+            continue;
+        else if(ptr->d_type == 8 || ptr->d_type == 10) {    ///file
+            //printf("d_name:%s/%s\n",basePath,ptr->d_name);
+            RatesData rd;
+            string filepath(path);
+            filepath.append("/");
+            filepath.append(ptr->d_name);
+            read_forex_csv(rd, MARKET_FOREX_FURTURES, filepath.c_str());
+            mapRatesData.insert(std::pair<SYMBOL, RatesData&>(rd.symbol, rd));
+        } else if (ptr->d_type == 4) { ///dir
+            memset(base,'\0',sizeof(base));
+            strcpy(base, path);
+            strcat(base,"/");
+            strcat(base,ptr->d_name);
+            get_forex_data(base);
+        }
+    }
+    closedir(dir);
+
+    return (0);
+}
+
 int reates_to_tick(RatesData& rd, TickData& td) {
-    strcpy(td.symbol,rd.symbol.symbol_name);
+    td.symbol = rd.symbol.symbol_name;
     td.market = rd.symbol.market;
     for (auto& p : rd.data) {
         MqlTick mt;
@@ -109,9 +143,9 @@ int reates_to_tick(RatesData& rd, TickData& td) {
     return (0);
 }
 
-int serializateRates(RatesData& rd, uint newDataAmount) {
-    rd.rs->size = rd.data.size() + newDataAmount;
-    rd.rs->amount = rd.data.size();
+int serializateRates(RatesData& rd, size_t newDataAmount) {
+    rd.rs.size = rd.data.size() + newDataAmount;
+    rd.rs.amount = rd.data.size();
     /*
     datetime * time;         // Period start time
     double   * open;         // Open price
@@ -121,61 +155,58 @@ int serializateRates(RatesData& rd, uint newDataAmount) {
     ulong    * tick_volume;  // Tick volume
     */
 
-    rd.rs->time  = reinterpret_cast<datetime*>(new char[
-        (sizeof(datetime) + 4 * sizeof(double) + sizeof(ulong)) * rd.rs->size]);
-    if (!rd.rs->time) return ERR_OUT_OF_MEMORY;
-    rd.rs->open  = reinterpret_cast<double*>(rd.rs->time + rd.rs->size);
-    rd.rs->high  = rd.rs->open + rd.rs->size;
-    rd.rs->low   = rd.rs->high + rd.rs->size;
-    rd.rs->close = rd.rs->low  + rd.rs->size;
-    rd.rs->tick_volume = reinterpret_cast<ulong*>(rd.rs->close + rd.rs->size);
+    rd.rs.time  = reinterpret_cast<datetime*>(new char[
+        (sizeof(datetime) + 4 * sizeof(double) + sizeof(ulong)) * rd.rs.size]);
+    if (!rd.rs.time) return ERR_OUT_OF_MEMORY;
+    rd.rs.open  = reinterpret_cast<double*>(rd.rs.time + rd.rs.size);
+    rd.rs.high  = rd.rs.open + rd.rs.size;
+    rd.rs.low   = rd.rs.high + rd.rs.size;
+    rd.rs.close = rd.rs.low  + rd.rs.size;
+    rd.rs.tick_volume = reinterpret_cast<ulong*>(rd.rs.close + rd.rs.size);
 
 
     for (size_t i = 0; i < rd.data.size(); ++i) {
-        rd.rs->open[i]  = rd.data[i].open ,
-        rd.rs->close[i] = rd.data[i].close,
-        rd.rs->open[i]  = rd.data[i].open ,
-        rd.rs->high[i]  = rd.data[i].high ,
-        rd.rs->low[i]   = rd.data[i].low  ,
-        rd.rs->time[i]  = rd.data[i].time ,
-        rd.rs->tick_volume[i] = rd.data[i].tick_volume;
+        rd.rs.open[i]  = rd.data[i].open ,
+        rd.rs.close[i] = rd.data[i].close,
+        rd.rs.open[i]  = rd.data[i].open ,
+        rd.rs.high[i]  = rd.data[i].high ,
+        rd.rs.low[i]   = rd.data[i].low  ,
+        rd.rs.time[i]  = rd.data[i].time ,
+        rd.rs.tick_volume[i] = rd.data[i].tick_volume;
     }
 
     return (0);
 }
 
 int addRateData(RatesData& rd, MqlRates& rate) {
-    if (rd.rs->amount + 1 > rd.rs->size) return ERR_OUT_OF_BUFFER;
+    if (rd.rs.amount + 1 > rd.rs.size) return ERR_OUT_OF_BUFFER;
     rd.data.push_back(rate);
-    rd.rs->time [rd.rs->amount] = rate.time;
-    rd.rs->open [rd.rs->amount] = rate.open;
-    rd.rs->high [rd.rs->amount] = rate.high;
-    rd.rs->low  [rd.rs->amount] = rate.low;
-    rd.rs->close[rd.rs->amount] = rate.close;
-    rd.rs->tick_volume[rd.rs->amount] = rate.tick_volume;
-    ++rd.rs->amount;
+    rd.rs.time [rd.rs.amount] = rate.time;
+    rd.rs.open [rd.rs.amount] = rate.open;
+    rd.rs.high [rd.rs.amount] = rate.high;
+    rd.rs.low  [rd.rs.amount] = rate.low;
+    rd.rs.close[rd.rs.amount] = rate.close;
+    rd.rs.tick_volume[rd.rs.amount] = rate.tick_volume;
+    ++rd.rs.amount;
     return (0);
 }
 
 void releaseRates(RatesData& rd) {
-    delete [] reinterpret_cast<char*>(rd.rs->time);
+    delete [] reinterpret_cast<char*>(rd.rs.time);
     memset(&rd.rs, 0, sizeof(rd.rs));
     rd.data.clear();
 }
 
 
 RatesData& getSymbol(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf) {
-    SYMBOL symbol(market, symbol_name.c_str(), tf);
-    return mapRatesData.find(symbol);
-}
-
-RatesData& getSymbol(MARKETID market, SYMBOL_NAME symbol_name, ENUM_TIMEFRAMES tf) {
     SYMBOL symbol(market, symbol_name, tf);
-    return mapRatesData.find(symbol);
+    MapRatesData::iterator iter = mapRatesData.find(symbol);
+    return iter->second;
 }
 
 RatesData& getSymbol(SYMBOL symbol) {
-    return mapRatesData.find(symbol);
+    MapRatesData::iterator iter = mapRatesData.find(symbol);
+    return iter->second;
 }
 
 

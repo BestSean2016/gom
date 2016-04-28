@@ -23,8 +23,6 @@ enum MARKETID {
     MARKET_CHINA_STOCKES,
 };
 
-#define SYMBOL_NAME_LENGTH 32
-typedef char SYMBOL_NAME[SYMBOL_NAME_LENGTH];
 
 #define MAX_DEEP_PRICE 5
 typedef double DEEP_PRICE[MAX_DEEP_PRICE];
@@ -245,18 +243,27 @@ typedef std::vector<MqlTick>  TickVector;
 ///this structure stores infoamtion about the series of one symbol
 typedef struct TickData {
     MARKETID    market;  //market id
-    SYMBOL_NAME symbol;  //
+    string      symbol;  //
     TickVector    data;
 } TickData;
 
 typedef struct SYMBOL {
     MARKETID        market;
-    SYMBOL_NAME     symbol_name;
+    string          symbol_name;
     ENUM_TIMEFRAMES period;
 
-    SYMBOL(MARKETID marketid, SYMBOL_NAME symb, MQL4::ENUM_TIMEFRAMES perd)
-        : market(marketid), period(perd){
-        strcpy(symbol_name, symb);
+    SYMBOL() {}
+    SYMBOL(MARKETID marketid, string& symb, MQL4::ENUM_TIMEFRAMES perd)
+        : market(marketid), symbol_name(symb), period(perd){
+    }
+
+    bool operator < (const SYMBOL& symbol) const {
+        if (market != symbol.market)
+            return market < symbol.market;
+        else if (symbol_name != symbol.symbol_name)
+            return symbol_name < symbol.symbol_name;
+        else
+            return period < symbol.period;
     }
 } SYMBOL;
 
@@ -265,7 +272,7 @@ typedef struct SYMBOL {
 typedef struct RatesData {
     SYMBOL          symbol;
     RatesVector       data;
-    RatesSerial*        rs;
+    RatesSerial         rs;
 } RatesData;
 
 typedef std::map<SYMBOL, RatesData&> MapRatesData;
@@ -276,7 +283,7 @@ typedef std::map<SYMBOL, RatesData&> MapRatesData;
  * @param newDataAmount reserved size of buffer of serializated
  * @return the result code, zero for succeed
  */
-extern int serializateRates(RatesData& rd, uint newDataAmount);
+extern int serializateRates(RatesData& rd, size_t newDataAmount);
 
 /**
  * @brief addRateData add a new RatesData
@@ -294,7 +301,6 @@ extern void releaseRates(RatesData& rd);
 
 
 extern RatesData& getSymbol(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf);
-extern RatesData& getSymbol(MARKETID market, SYMBOL_NAME symbol_name, ENUM_TIMEFRAMES tf);
 extern RatesData& getSymbol(SYMBOL symbol);
 
 extern MapRatesData mapRatesData;
