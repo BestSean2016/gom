@@ -6,6 +6,7 @@
 #include "stderror-mql4.h"
 #include <string>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -248,14 +249,26 @@ typedef struct TickData {
     TickVector    data;
 } TickData;
 
+typedef struct SYMBOL {
+    MARKETID        market;
+    SYMBOL_NAME     symbol_name;
+    ENUM_TIMEFRAMES period;
+
+    SYMBOL(MARKETID marketid, SYMBOL_NAME symb, MQL4::ENUM_TIMEFRAMES perd)
+        : market(marketid), period(perd){
+        strcpy(symbol_name, symb);
+    }
+} SYMBOL;
+
+
 ///this structure stores series of one rates
 typedef struct RatesData {
-    MARKETID        market;
-    SYMBOL_NAME     symbol;
-    ENUM_TIMEFRAMES period;
+    SYMBOL          symbol;
     RatesVector       data;
     RatesSerial*        rs;
 } RatesData;
+
+typedef std::map<SYMBOL, RatesData&> MapRatesData;
 
 /**
  * @brief serializateRates serializate rates data
@@ -263,7 +276,7 @@ typedef struct RatesData {
  * @param newDataAmount reserved size of buffer of serializated
  * @return the result code, zero for succeed
  */
-int serializateRates(RatesData& rd, uint newDataAmount);
+extern int serializateRates(RatesData& rd, uint newDataAmount);
 
 /**
  * @brief addRateData add a new RatesData
@@ -271,13 +284,21 @@ int serializateRates(RatesData& rd, uint newDataAmount);
  * @param rate new data
  * @return the result code
  */
-int addRateData(RatesData& rd, MqlRates& rate);
+extern int addRateData(RatesData& rd, MqlRates& rate);
 
 /**
  * @brief releaseRates release memory of RatesData
  * @param rd the RatesData space
  */
-void releaseRates(RatesData& rd);
+extern void releaseRates(RatesData& rd);
+
+
+extern RatesData& getSymbol(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf);
+extern RatesData& getSymbol(MARKETID market, SYMBOL_NAME symbol_name, ENUM_TIMEFRAMES tf);
+extern RatesData& getSymbol(SYMBOL symbol);
+
+extern MapRatesData mapRatesData;
+
 
 } //namespace MQL4
 

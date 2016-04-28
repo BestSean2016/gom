@@ -23,6 +23,8 @@ bool operator== (MQL4::MqlRates& r , MQL4::MqlTick& t) {
 
 namespace MQL4 {
 
+MapRatesData mapRatesData;
+
 //forex
 //date,      time, open,   high,   low,    close,  volume
 //2016.04.08,16:22,108.600,108.601,108.551,108.555,86
@@ -59,10 +61,10 @@ static int get_forex_furtures(RatesData &rd, const char* csvfile) {
     while(i < symbol_full.size() && !isdigit(symbol_full[i])) ++i;
     if (i == symbol_full.length()) return ERR_ERROR_FOREX_FILEPATH;
 
-    rd.market = MARKET_FOREX_FURTURES;
-    symbol_full.copy(rd.symbol, i);
-    rd.symbol[i] = 0;
-    rd.period = (ENUM_TIMEFRAMES)atoi(symbol_full.substr(i, symbol_full.length() - i).c_str());
+    rd.symbol.market = MARKET_FOREX_FURTURES;
+    symbol_full.copy(rd.symbol.symbol_name, i);
+    rd.symbol.symbol_name[i] = 0;
+    rd.symbol.period = (ENUM_TIMEFRAMES)atoi(symbol_full.substr(i, symbol_full.length() - i).c_str());
 
     //
     //TO DO: check the rd.et is valid
@@ -94,8 +96,8 @@ int read_forex_csv(RatesData &rd, MARKETID market, const char* csvfile) {
 }
 
 int reates_to_tick(RatesData& rd, TickData& td) {
-    strcpy(td.symbol,rd.symbol);
-    td.market = rd.market;
+    strcpy(td.symbol,rd.symbol.symbol_name);
+    td.market = rd.symbol.market;
     for (auto& p : rd.data) {
         MqlTick mt;
         mt.bid[0] = mt.ask[0] = mt.last = p.open,
@@ -160,5 +162,22 @@ void releaseRates(RatesData& rd) {
     memset(&rd.rs, 0, sizeof(rd.rs));
     rd.data.clear();
 }
+
+
+RatesData& getSymbol(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf) {
+    SYMBOL symbol(market, symbol_name.c_str(), tf);
+    return mapRatesData.find(symbol);
+}
+
+RatesData& getSymbol(MARKETID market, SYMBOL_NAME symbol_name, ENUM_TIMEFRAMES tf) {
+    SYMBOL symbol(market, symbol_name, tf);
+    return mapRatesData.find(symbol);
+}
+
+RatesData& getSymbol(SYMBOL symbol) {
+    return mapRatesData.find(symbol);
+}
+
+
 
 } //namespace MQL4

@@ -29,13 +29,13 @@ TEST_CASE( "ForexStringToTime", "Convertions") {
 TEST_CASE( "read_forex_csv", "DataAdaptor") {
     MQL4::RatesData rd;
     int result = MQL4::read_forex_csv(
-                rd,
-                MQL4::MARKET_FOREX_FURTURES,
-                "/home/sean/projects/quants/gom/data/USDJPY1.csv");
+                   rd,
+                   MQL4::MARKET_FOREX_FURTURES,
+                   "/home/sean/projects/quants/gom/data/USDJPY1.csv");
     REQUIRE(result == 0);
-    REQUIRE(rd.market == MQL4::MARKET_FOREX_FURTURES);
-    REQUIRE(rd.symbol == string("USDJPY"));
-    REQUIRE(rd.period == MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
+    REQUIRE(rd.symbol.market == MQL4::MARKET_FOREX_FURTURES);
+    REQUIRE(rd.symbol.symbol == string("USDJPY"));
+    REQUIRE(rd.symbol.period == MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
     REQUIRE(rd.data.size() == 13455);
 
     MQL4::MqlRates r;
