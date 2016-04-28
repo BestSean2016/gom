@@ -56,10 +56,12 @@ static int get_forex_furtures(RatesData &rd, const char* csvfile) {
 
     //get symbol and period
     size_t i = 0;
-    while(!isdigit(symbol_full[i++]));
+    while(i < symbol_full.size() && !isdigit(symbol_full[i])) ++i;
     if (i == symbol_full.length()) return ERR_ERROR_FOREX_FILEPATH;
-    --i;
-    symbol_full.copy(rd.symbol, i, 0);
+
+    rd.market = MARKET_FOREX_FURTURES;
+    symbol_full.copy(rd.symbol, i);
+    rd.symbol[i] = 0;
     rd.period = (ENUM_TIMEFRAMES)atoi(symbol_full.substr(i, symbol_full.length() - i).c_str());
 
     //
@@ -105,12 +107,58 @@ int reates_to_tick(RatesData& rd, TickData& td) {
     return (0);
 }
 
-int serializateRates(RateData& rd, uint newDataAmount) {
+int serializateRates(RatesData& rd, uint newDataAmount) {
+    rd.rs->size = rd.data.size() + newDataAmount;
+    rd.rs->amount = rd.data.size();
+    /*
+    datetime * time;         // Period start time
+    double   * open;         // Open price
+    double   * high;         // The highest price of the period
+    double   * low;          // The lowest price of the period
+    double   * close;        // Close price
+    ulong    * tick_volume;  // Tick volume
+    */
+
+    rd.rs->time  = reinterpret_cast<datetime*>(new char[
+        (sizeof(datetime) + 4 * sizeof(double) + sizeof(ulong)) * rd.rs->size]);
+    if (!rd.rs->time) return ERR_OUT_OF_MEMORY;
+    rd.rs->open  = reinterpret_cast<double*>(rd.rs->time + rd.rs->size);
+    rd.rs->high  = rd.rs->open + rd.rs->size;
+    rd.rs->low   = rd.rs->high + rd.rs->size;
+    rd.rs->close = rd.rs->low  + rd.rs->size;
+    rd.rs->tick_volume = reinterpret_cast<ulong*>(rd.rs->close + rd.rs->size);
+
+
+    for (size_t i = 0; i < rd.data.size(); ++i) {
+        rd.rs->open[i]  = rd.data[i].open ,
+        rd.rs->close[i] = rd.data[i].close,
+        rd.rs->open[i]  = rd.data[i].open ,
+        rd.rs->high[i]  = rd.data[i].high ,
+        rd.rs->low[i]   = rd.data[i].low  ,
+        rd.rs->time[i]  = rd.data[i].time ,
+        rd.rs->tick_volume[i] = rd.data[i].tick_volume;
+    }
+
     return (0);
 }
 
 int addRateData(RatesData& rd, MqlRates& rate) {
+    if (rd.rs->amount + 1 > rd.rs->size) return ERR_OUT_OF_BUFFER;
+    rd.data.push_back(rate);
+    rd.rs->time [rd.rs->amount] = rate.time;
+    rd.rs->open [rd.rs->amount] = rate.open;
+    rd.rs->high [rd.rs->amount] = rate.high;
+    rd.rs->low  [rd.rs->amount] = rate.low;
+    rd.rs->close[rd.rs->amount] = rate.close;
+    rd.rs->tick_volume[rd.rs->amount] = rate.tick_volume;
+    ++rd.rs->amount;
     return (0);
+}
+
+void releaseRates(RatesData& rd) {
+    delete [] reinterpret_cast<char*>(rd.rs->time);
+    memset(&rd.rs, 0, sizeof(rd.rs));
+    rd.data.clear();
 }
 
 } //namespace MQL4

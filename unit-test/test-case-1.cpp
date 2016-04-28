@@ -92,3 +92,28 @@ TEST_CASE( "read_forex_csv", "DataAdaptor") {
         REQUIRE(t);
     }
 }
+
+TEST_CASE( "serialization of forex rates", "serialization") {
+    MQL4::RatesData rd;
+    int result = MQL4::read_forex_csv(
+                rd,
+                MQL4::MARKET_FOREX_FURTURES,
+                "/home/sean/projects/quants/gom/data/USDJPY1.csv");
+    REQUIRE(result == 0);
+
+    result = MQL4::serializateRates(rd, rd.data.size());
+    REQUIRE(result == 0);
+    REQUIRE(rd.rs->size == rd.data.size() * 2);
+    REQUIRE(rd.rs->amount == rd.data.size());
+
+    for (size_t i = 0; i < rd.data.size(); ++i) {
+        bool t = (rd.data[i].open == rd.rs->open[i]
+             && rd.data[i].close == rd.rs->close[i]
+             && rd.data[i].open == rd.rs->open[i]
+             && rd.data[i].high == rd.rs->high[i]
+             && rd.data[i].low == rd.rs->low[i]
+             && rd.data[i].time == rd.rs->time[i]
+             && rd.data[i].tick_volume == rd.rs->tick_volume[i]);
+        REQUIRE(t);
+    }
+}

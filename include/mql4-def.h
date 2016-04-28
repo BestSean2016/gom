@@ -215,7 +215,8 @@ typedef struct MqlRates
 
 
 typedef struct RatesSerial {
-    ulong      amount;
+    size_t     amount;
+    size_t     size;
     datetime * time;         // Period start time
     double   * open;         // Open price
     double   * high;         // The highest price of the period
@@ -262,15 +263,21 @@ typedef struct RatesData {
  * @param newDataAmount reserved size of buffer of serializated
  * @return the result code, zero for succeed
  */
-int serializateRates(RateData& rd, uint newDataAmount);
+int serializateRates(RatesData& rd, uint newDataAmount);
 
 /**
  * @brief addRateData add a new RatesData
- * @param rd
- * @param rate
+ * @param rd the RateData space
+ * @param rate new data
+ * @return the result code
  */
 int addRateData(RatesData& rd, MqlRates& rate);
-void releaseRates(RateData& rd);
+
+/**
+ * @brief releaseRates release memory of RatesData
+ * @param rd the RatesData space
+ */
+void releaseRates(RatesData& rd);
 
 } //namespace MQL4
 

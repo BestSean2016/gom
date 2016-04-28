@@ -21,7 +21,7 @@ static int Bars_ = 0;
 static double Bid_ = 0;
 static double Ask_ = 0;
 
-extern double _Point;
+static double _Point = 0;
 
 using namespace MQL4;
 
