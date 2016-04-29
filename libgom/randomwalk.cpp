@@ -3,31 +3,34 @@
 #include <string.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <sstream>
 
 #include "libgom.h"
 
 
-bool operator== (MQL4::MqlRates& r1, MQL4::MqlRates& r2)
-{
-    return (r1.close == r2.close &&
-            r1.high  == r2.high  &&
-            r1.low   == r2.low   &&
-            r1.open  == r2.open  &&
-            r1.real_volume == r2.real_volume &&
-            r1.spread == r2.spread &&
-            r1.tick_volume == r2.tick_volume &&
-            r1.time == r2.time);
-}
-
-bool operator== (MQL4::MqlRates& r , MQL4::MqlTick& t) {
-    return (r.open == t.last && r.open == t.ask[0] && r.open == t.bid[0] &&
-            r.tick_volume == t.last_volume && r.tick_volume == t.ask_volume[0] && r.tick_volume == t.bid_volume[0] &&
-            r.time == t.time);
-}
-
 namespace MQL4 {
 
 MapRatesData mapRatesData;
+
+bool MqlRates::operator== (const MQL4::MqlRates& r2)
+{
+    return (close == r2.close &&
+            high  == r2.high  &&
+            low   == r2.low   &&
+            open  == r2.open  &&
+            tick_volume == r2.tick_volume &&
+            //real_volume == r2.real_volume &&
+            //spread == r2.spread &&
+            time == r2.time);
+}
+
+bool MqlRates::operator== (const MqlTick& t) {
+    return (open == t.last && open == t.ask[0] && open == t.bid[0] &&
+            tick_volume == t.last_volume && tick_volume == t.ask_volume[0] &&
+            tick_volume == t.bid_volume[0] && time == t.time);
+}
+
 
 //forex
 //date,      time, open,   high,   low,    close,  volume
@@ -49,6 +52,8 @@ static int get_forex_rates_data(MqlRates& rate, const string& str) {
     rate.close = atof(p);
     p += 8;
     rate.tick_volume = atol(p);
+    //rate.real_volume = 0;
+    //rate.spread = 0;
 
     return (0);
 }
@@ -68,7 +73,7 @@ static int get_forex_furtures(RatesData &rd, const char* csvfile) {
     rd.symbol.market = MARKET_FOREX_FURTURES;
     rd.symbol.symbol_name = symbol_full.substr(0, i);
     rd.symbol.period = (ENUM_TIMEFRAMES)atoi(symbol_full.substr(i, symbol_full.length() - i).c_str());
-
+    genSymbolKey(MARKET_FOREX_FURTURES, rd.symbol.symbol_name, rd.symbol.period, rd.key_);
     //
     //TO DO: check the rd.et is valid
     //
@@ -81,6 +86,8 @@ static int get_forex_furtures(RatesData &rd, const char* csvfile) {
             break;
         rd.data.push_back(rate);
     }
+
+    serializateRates(rd, rd.data.size());
 
     //cout << rd.et << ',' << rd.symbol << endl;
     return (0);
@@ -100,6 +107,7 @@ int read_forex_csv(RatesData &rd, MARKETID market, const char* csvfile) {
 int get_forex_data(const char* path) {
     DIR *dir;
     struct dirent *ptr;
+    struct stat file_stat;
     char base[1000];
 
     if ((dir=opendir(path)) == NULL)
@@ -108,24 +116,30 @@ int get_forex_data(const char* path) {
     while ((ptr=readdir(dir)) != NULL) {
         if(strcmp(ptr->d_name,".")==0 || strcmp(ptr->d_name,"..")==0)    ///current dir OR parrent dir
             continue;
-        else if(ptr->d_type == 8 || ptr->d_type == 10) {    ///file
-            //printf("d_name:%s/%s\n",basePath,ptr->d_name);
-            RatesData rd;
+        else {
             string filepath(path);
             filepath.append("/");
             filepath.append(ptr->d_name);
-            read_forex_csv(rd, MARKET_FOREX_FURTURES, filepath.c_str());
-            mapRatesData.insert(std::pair<SYMBOL, RatesData&>(rd.symbol, rd));
-        } else if (ptr->d_type == 4) { ///dir
-            memset(base,'\0',sizeof(base));
-            strcpy(base, path);
-            strcat(base,"/");
-            strcat(base,ptr->d_name);
-            get_forex_data(base);
+            lstat(filepath.c_str(), &file_stat);
+            if(S_ISREG(file_stat.st_mode)) {    ///file
+                //printf("d_name:%s/%s\n",basePath,ptr->d_name);
+                RatesData * rd = new RatesData;
+                read_forex_csv(*rd, MARKET_FOREX_FURTURES, filepath.c_str());
+                mapRatesData.insert(std::pair<string, RatesData*>(rd->key_, rd));
+            } else if (S_ISDIR(file_stat.st_mode)) { ///dir
+                memset(base,'\0',sizeof(base));
+                strcpy(base, path);
+                strcat(base,"/");
+                strcat(base,ptr->d_name);
+                get_forex_data(base);
+            }
         }
     }
     closedir(dir);
 
+    string s("0|USDJPY|1");
+    RatesData* rd = getSymbol(s);
+    rd->symbol.market = MARKET_FOREX_FURTURES;
     return (0);
 }
 
@@ -197,18 +211,54 @@ void releaseRates(RatesData& rd) {
     rd.data.clear();
 }
 
-
-RatesData& getSymbol(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf) {
-    SYMBOL symbol(market, symbol_name, tf);
-    MapRatesData::iterator iter = mapRatesData.find(symbol);
-    return iter->second;
+void releaseRates(RatesData* rd) {
+    delete [] reinterpret_cast<char*>(rd->rs.time);
+    memset(&rd->rs, 0, sizeof(rd->rs));
+    rd->data.clear();
 }
 
-RatesData& getSymbol(SYMBOL symbol) {
-    MapRatesData::iterator iter = mapRatesData.find(symbol);
-    return iter->second;
+void releaseRatesFromMap() {
+    for(auto &iter : mapRatesData) {
+        releaseRates(iter.second);
+        delete iter.second;
+    }
+    mapRatesData.clear();
 }
 
+
+RatesData* getSymbol(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf) {
+    string key;
+    MapRatesData::iterator iter = mapRatesData.find(genSymbolKey(market, symbol_name, tf, key));
+    return iter->second;
+    //if (iter == mapRatesData.end())
+    //    return (0);
+    //else
+    //    return iter->second;
+}
+
+inline string& genSymbolKey(MQL4::SYMBOL &symbol, std::string &key) {
+    stringstream ss;
+    ss << symbol.market << "|" << symbol.symbol_name << "|" << symbol.period;
+    ss >> key;
+    return key;
+}
+
+inline string &genSymbolKey(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf,string& key) {
+    stringstream ss;
+    ss << market << "|" << symbol_name << "|" << tf;
+    ss >> key;
+    return key;
+}
+
+
+RatesData* getSymbol(std::string &key) {
+    MapRatesData::iterator iter = mapRatesData.find(key);
+    return iter->second;
+    //if (iter == mapRatesData.end())
+    //    return (0);
+    //else
+    //    return iter->second;
+}
 
 
 } //namespace MQL4

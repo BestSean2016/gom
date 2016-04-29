@@ -199,6 +199,19 @@ typedef struct MqlDateTime
 }MqlDateTime;
 
 
+//This is a structure for storing the latest prices of the symbol. It is designed for fast retrieval of the most requested information about current prices.
+typedef struct MqlTick
+{
+    datetime     time;          // Time of the last prices update
+    double       last;          // Price of the last deal (Last)
+    DEEP_PRICE   bid;           // Bid price
+    DEEP_PRICE   ask;           // Ask price
+    ulong        last_volume;                // Volume for the current Last price
+    DEEP_VOLUME  bid_volume;
+    DEEP_VOLUME  ask_volume;
+} MqlTick ;
+
+
 //This structure stores information about the prices, volumes and spread.
 typedef struct MqlRates
 {
@@ -210,6 +223,10 @@ typedef struct MqlRates
     ulong    tick_volume;  // Tick volume
     int      spread;       // Spread
     ulong    real_volume;  // Trade volume
+
+    bool operator== (const MQL4::MqlRates& r2);
+    bool operator== (const MQL4::MqlTick& t);
+
 } MqlRates;
 
 
@@ -223,19 +240,6 @@ typedef struct RatesSerial {
     double   * close;        // Close price
     ulong    * tick_volume;  // Tick volume
 } RatesSerial;
-
-//This is a structure for storing the latest prices of the symbol. It is designed for fast retrieval of the most requested information about current prices.
-typedef struct MqlTick
-{
-    datetime     time;          // Time of the last prices update
-    double       last;          // Price of the last deal (Last)
-    DEEP_PRICE   bid;           // Bid price
-    DEEP_PRICE   ask;           // Ask price
-    ulong        last_volume;                // Volume for the current Last price
-    DEEP_VOLUME  bid_volume;
-    DEEP_VOLUME  ask_volume;
-} MqlTick ;
-
 
 typedef std::vector<MqlRates> RatesVector;
 typedef std::vector<MqlTick>  TickVector;
@@ -270,12 +274,13 @@ typedef struct SYMBOL {
 
 ///this structure stores series of one rates
 typedef struct RatesData {
+    string            key_; //key for search in map
     SYMBOL          symbol;
     RatesVector       data;
     RatesSerial         rs;
 } RatesData;
 
-typedef std::map<SYMBOL, RatesData&> MapRatesData;
+typedef std::map<string, RatesData*> MapRatesData;
 
 /**
  * @brief serializateRates serializate rates data
@@ -298,18 +303,17 @@ extern int addRateData(RatesData& rd, MqlRates& rate);
  * @param rd the RatesData space
  */
 extern void releaseRates(RatesData& rd);
+extern void releaseRates(RatesData* rd);
+extern void releaseRatesFromMap();
 
-
-extern RatesData& getSymbol(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf);
-extern RatesData& getSymbol(SYMBOL symbol);
-
+extern RatesData * getSymbol(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf);
+extern RatesData * getSymbol(string& key);
+extern inline string &genSymbolKey(SYMBOL& symbol,string& key);
+extern inline string &genSymbolKey(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf,string& key);
 extern MapRatesData mapRatesData;
 
 
 } //namespace MQL4
-
-extern bool operator== (MQL4::MqlRates& r1, MQL4::MqlRates& r2);
-extern bool operator== (MQL4::MqlRates& r , MQL4::MqlTick& t);
 
 
 #endif // MQL4DEF_H
