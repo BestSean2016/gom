@@ -4,8 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 INCLUDEPATH += ../include
-INCLUDEPATH += /home/sean/projects/googletest/googletest/include/gtest
-LIBS += -L /home/sean/projects/googletest/build/build/googlemock/gtest -lgtest -lgtest_main
+INCLUDEPATH += /home/sean/projects/googletest/googletest/include
+LIBS += -L /home/sean/projects/googletest/build/build/googlemock/gtest -lgtest -lgtest_main -lpthread
 
 SOURCES += \
     test-case-1.cpp \
@@ -14,4 +14,4 @@ SOURCES += \
     ../libgom/randomwalk.cpp
 
 HEADERS += \
-    catch.hpp
+    /home/sean/projects/googletest/googletest/include/gtest/gtest.h
