@@ -1,3 +1,4 @@
+#include "mql4-data.h"
 #include "indicator.h"
 
 
@@ -8,7 +9,7 @@ int  iBars(
    string           symbol,          // symbol
    ENUM_TIMEFRAMES  timeframe        // timeframe
    ) {
-    RatesData* rates = getSymbol(MARKET_FOREX_FURTURES, symbol, timeframe);
+    RatesData* rates = MQL4::mapRatesData.getSymbol(MARKET_FOREX_FURTURES, symbol, timeframe);
     if (!rates)
         return (0);
     else

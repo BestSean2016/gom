@@ -13,8 +13,7 @@ int main(const int argc, const char* argv[]) {
 
 
     MQL4::RatesData rd;
-    int result = MQL4::read_forex_csv(
-                   rd,
+    int result = rd.read_forex_csv(
                    MQL4::MARKET_FOREX_FURTURES,
                    "/home/sean/projects/quants/gom/data/USDJPY1.csv");
     REQUIRE(result == 0);
@@ -69,13 +68,13 @@ int main(const int argc, const char* argv[]) {
     REQUIRE(t);
 
     MQL4::TickData td;
-    reates_to_tick(rd, td);
+    rd.reates_to_tick(td);
     REQUIRE(rd.data.size() == td.data.size());
     for (size_t i = 0; i < rd.data.size(); ++i) {
         t = (rd.data[i] == td.data[i]);
         REQUIRE(t);
     }
 
-    MQL4::releaseRates(rd);
+    rd.releaseData();
     return (0);
 }

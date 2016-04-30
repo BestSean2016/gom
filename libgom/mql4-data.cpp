@@ -1,0 +1,289 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+#include "mql4-data.h"
+#include "datetime.h"
+
+namespace MQL4 {
+
+//global data
+MapRatesData mapRatesData;
+
+
+//
+// structMqlRates
+bool MqlRates::operator== (const MQL4::MqlRates& r2)
+{
+    return (close == r2.close &&
+            high  == r2.high  &&
+            low   == r2.low   &&
+            open  == r2.open  &&
+            tick_volume == r2.tick_volume &&
+            //real_volume == r2.real_volume &&
+            //spread == r2.spread &&
+            time == r2.time);
+}
+
+bool MqlRates::operator== (const MqlTick& t) {
+    return (open == t.last && open == t.ask[0] && open == t.bid[0] &&
+            tick_volume == t.last_volume && tick_volume == t.ask_volume[0] &&
+            tick_volume == t.bid_volume[0] && time == t.time);
+}
+
+
+
+
+//
+// class RatesData
+//
+
+RatesData::RatesData() { }
+RatesData::~RatesData() {}
+
+/* initial data */
+int RatesData::read_forex_csv(MARKETID market, const char* csvfile) {
+    int result = ERR_UNKONW_MARKET;
+    switch((int)market) {
+    case MARKET_FOREX_FURTURES:
+        result = get_forex_furtures_(csvfile);
+        break;
+    }
+
+    return result;
+}
+
+
+//forex
+//date,      time, open,   high,   low,    close,  volume
+//2016.04.08,16:22,108.600,108.601,108.551,108.555,86
+//
+
+int RatesData::get_forex_rates_data__(MqlRates& rate, const string& str) {
+    if (str.length() < 50)
+        return ERR_NO_ENOGHT_FOREX_DATA_IN_LINE;
+
+    char* p = (char*)str.c_str();
+    rate.time = MQL4::ForexStringToTime(p);
+    p += 17;
+    rate.open = atof(p);
+    p += 8;
+    rate.high = atof(p);
+    p += 8;
+    rate.low = atof(p);
+    p += 8;
+    rate.close = atof(p);
+    p += 8;
+    rate.tick_volume = atol(p);
+    //rate.real_volume = 0;
+    //rate.spread = 0;
+
+    return (0);
+}
+
+int RatesData::get_forex_furtures_(const char* csvfile) {
+    string str(csvfile);
+
+    size_t found = str.rfind(CHAR_PATH_SPERATOR);
+    string symbol_full = str.substr(found + 1, str.length() - found -1);
+    //cout << symbol_full << endl;
+
+    //get symbol and period
+    size_t i = 0;
+    while(i < symbol_full.size() && !isdigit(symbol_full[i])) ++i;
+    if (i == symbol_full.length()) return ERR_ERROR_FOREX_FILEPATH;
+
+    symbol.market = MARKET_FOREX_FURTURES;
+    symbol.symbol_name = symbol_full.substr(0, i);
+    symbol.period = (ENUM_TIMEFRAMES)atoi(symbol_full.substr(i, symbol_full.length() - i).c_str());
+    genSymbolKey(MARKET_FOREX_FURTURES, symbol.symbol_name, symbol.period, key_);
+    //
+    //TO DO: check the rd.et is valid
+    //
+
+    //read data
+    std::ifstream fin(csvfile);
+    while(getline(fin, str)) {
+        MqlRates rate;
+        if (get_forex_rates_data__(rate, str))
+            break;
+        data.push_back(rate);
+    }
+
+    serializateRates(data.size());
+
+    //cout << rd.et << ',' << rd.symbol << endl;
+    return (0);
+}
+
+
+int RatesData::serializateRates(size_t newDataAmount) {
+    rs.size   = data.size() + newDataAmount;
+    rs.amount = data.size();
+    /*
+    datetime * time;         // Period start time
+    double   * open;         // Open price
+    double   * high;         // The highest price of the period
+    double   * low;          // The lowest price of the period
+    double   * close;        // Close price
+    ulong    * tick_volume;  // Tick volume
+    */
+
+    rs.time  = reinterpret_cast<datetime*>(new char[
+        (sizeof(datetime) + 4 * sizeof(double) + sizeof(ulong)) * rs.size]);
+    if (!rs.time) return ERR_OUT_OF_MEMORY;
+    rs.open  = reinterpret_cast<double*>(rs.time + rs.size);
+    rs.high  = rs.open + rs.size;
+    rs.low   = rs.high + rs.size;
+    rs.close = rs.low  + rs.size;
+    rs.tick_volume = reinterpret_cast<ulong*>(rs.close + rs.size);
+
+
+    for (size_t i = 0; i < data.size(); ++i) {
+        rs.open[i]  = data[i].open ,
+        rs.close[i] = data[i].close,
+        rs.open[i]  = data[i].open ,
+        rs.high[i]  = data[i].high ,
+        rs.low[i]   = data[i].low  ,
+        rs.time[i]  = data[i].time ,
+        rs.tick_volume[i] = data[i].tick_volume;
+    }
+
+    return (0);
+}
+
+int RatesData::reates_to_tick(TickData& td) {
+    td.symbol = symbol.symbol_name;
+    td.market = symbol.market;
+    for (auto& p : data) {
+        MqlTick mt;
+        mt.bid[0] = mt.ask[0] = mt.last = p.open,
+                mt.bid_volume[0] = mt.ask_volume[0] = mt.last_volume = p.tick_volume,
+                mt.time = p.time;
+        td.data.push_back(mt);
+    }
+
+    return (0);
+}
+
+int RatesData::addRateData(MqlRates& rate) {
+    if (rs.amount + 1 > rs.size) return ERR_OUT_OF_BUFFER;
+    data.push_back(rate);
+    rs.time [rs.amount] = rate.time;
+    rs.open [rs.amount] = rate.open;
+    rs.high [rs.amount] = rate.high;
+    rs.low  [rs.amount] = rate.low;
+    rs.close[rs.amount] = rate.close;
+    rs.tick_volume[rs.amount] = rate.tick_volume;
+    ++rs.amount;
+    return (0);
+}
+
+void RatesData::releaseData() {
+    delete [] reinterpret_cast<char*>(rs.time);
+    ::memset(&rs, 0, sizeof(rs));
+    data.clear();
+}
+
+
+
+//
+// class map <--> rates data
+//
+
+
+
+MapRatesData::MapRatesData() {}
+MapRatesData::~MapRatesData() {}
+
+int MapRatesData::get_forex_data(const char* path) {
+    DIR *dir;
+    struct dirent *ptr;
+    struct stat file_stat;
+    char base[1000];
+
+    if ((dir=opendir(path)) == NULL)
+        return ERR_WRONG_PATH;
+
+    while ((ptr=readdir(dir)) != NULL) {
+        if(strcmp(ptr->d_name,".")==0 || strcmp(ptr->d_name,"..")==0)    ///current dir OR parrent dir
+            continue;
+        else {
+            string filepath(path);
+            filepath.append("/");
+            filepath.append(ptr->d_name);
+            lstat(filepath.c_str(), &file_stat);
+            if(S_ISREG(file_stat.st_mode)) {    ///file
+                //printf("d_name:%s/%s\n",basePath,ptr->d_name);
+                RatesData * rd = new RatesData;
+                rd->read_forex_csv(MARKET_FOREX_FURTURES, filepath.c_str());
+                map_.insert(std::pair<string, RatesData*>(rd->key_, rd));
+            } else if (S_ISDIR(file_stat.st_mode)) { ///dir
+                memset(base,'\0',sizeof(base));
+                strcpy(base, path);
+                strcat(base,"/");
+                strcat(base,ptr->d_name);
+                get_forex_data(base);
+            }
+        }
+    }
+    closedir(dir);
+
+    return (0);
+}
+
+void MapRatesData::releaseRatesFromMap() {
+    for(auto &iter : map_) {
+        iter.second->releaseData();
+        delete iter.second;
+    }
+    map_.clear();
+}
+
+size_t MapRatesData::size() {
+    return map_.size();
+}
+
+
+RatesData* MapRatesData::getSymbol(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf) {
+    string key;
+    MAP_RATES_DATA::iterator iter = map_.find(genSymbolKey(market, symbol_name, tf, key));
+    return iter->second;
+    //if (iter == mapRatesData.end())
+    //    return (0);
+    //else
+    //    return iter->second;
+}
+
+RatesData* MapRatesData::getSymbol(std::string &key) {
+    MAP_RATES_DATA::iterator iter = map_.find(key);
+    return iter->second;
+    //if (iter == mapRatesData.end())
+    //    return (0);
+    //else
+    //    return iter->second;
+}
+
+inline string& genSymbolKey(MQL4::SYMBOL &symbol, std::string &key) {
+    stringstream ss;
+    ss << symbol.market << "|" << symbol.symbol_name << "|" << symbol.period;
+    ss >> key;
+    return key;
+}
+
+inline string &genSymbolKey(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf,string& key) {
+    stringstream ss;
+    ss << market << "|" << symbol_name << "|" << tf;
+    ss >> key;
+    return key;
+}
+
+
+
+} //namespace MQL4

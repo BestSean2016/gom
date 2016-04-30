@@ -18,7 +18,8 @@ SOURCES += datagen.cpp \
     ../libgom/Math.cpp \
     ../libgom/string-ops.cpp \
     ../libgom/TimeSeries.cpp \
-    ../libgom/Trading.cpp
+    ../libgom/Trading.cpp \
+    ../libgom/mql4-data.cpp
 
 HEADERS += \
     ../include/StdLibErr.h \
@@ -33,5 +34,6 @@ HEADERS += \
     ../include/stdlib-mql4.h \
     ../include/string-ops.h \
     ../include/Tradeing.h \
-    ../include/indicator.h
+    ../include/indicator.h \
+    ../include/mql4-data.h
 

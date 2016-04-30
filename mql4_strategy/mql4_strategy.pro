@@ -18,7 +18,8 @@ SOURCES += main.cpp \
     ../libgom/stdlib-mql4.cpp \
     ../libgom/string-ops.cpp \
     ../libgom/TimeSeries.cpp \
-    ../libgom/Trading.cpp
+    ../libgom/Trading.cpp \
+    ../libgom/mql4-data.cpp
 
 HEADERS += \
     ../include/datetime.h \

@@ -9,9 +9,11 @@ LIBS += -L /home/sean/projects/googletest/build/build/googlemock/gtest -lgtest -
 
 SOURCES += \
     test-case-1.cpp \
-    ../libgom/datetime.cpp \
     ../libgom/getopt.cpp \
-    ../libgom/randomwalk.cpp
+    ../libgom/randomwalk.cpp \
+    ../libgom/indicator.cpp \
+    ../libgom/mql4-data.cpp \
+    ../libgom/datetime.cpp
 
 HEADERS += \
     /home/sean/projects/googletest/googletest/include/gtest/gtest.h

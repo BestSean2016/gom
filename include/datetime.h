@@ -2,6 +2,7 @@
 #define DATETIME_H_INLCUDE
 
 #include "mql4-def.h"
+#include "mql4-data.h"
 
 //TimeCurrent
 //Returns the last known server time (time of the last quote receipt) in the datetime format

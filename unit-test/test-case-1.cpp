@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "mql4-def.h"
+#include "mql4-data.h"
 #include "libgom.h"
 
 TEST(ForexStringToTime, Convertions) {
@@ -27,8 +28,7 @@ TEST(ForexStringToTime, Convertions) {
 
 TEST (read_forex_csv, DataAdaptor) {
     MQL4::RatesData rd;
-    int result = MQL4::read_forex_csv(
-                   rd,
+    int result = rd.read_forex_csv(
                    MQL4::MARKET_FOREX_FURTURES,
                    "/home/sean/projects/quants/gom/data/USDJPY1.csv");
     EXPECT_EQ(result, 0);
@@ -84,7 +84,7 @@ TEST (read_forex_csv, DataAdaptor) {
     EXPECT_EQ(t, true);
 
     MQL4::TickData td;
-    reates_to_tick(rd, td);
+    rd.reates_to_tick(td);
     EXPECT_EQ(rd.data.size(), td.data.size());
     for (size_t i = 0; i < rd.data.size(); ++i) {
         t = (rd.data[i] == td.data[i]);
@@ -92,7 +92,7 @@ TEST (read_forex_csv, DataAdaptor) {
     }
 
 
-    MQL4::releaseRates(rd);
+    rd.releaseData();
     EXPECT_EQ((rd.rs.time == 0), true);
     EXPECT_EQ(rd.data.size(), (size_t)0);
     EXPECT_EQ(rd.rs.amount, (size_t)0);
@@ -102,8 +102,7 @@ TEST (read_forex_csv, DataAdaptor) {
 
 TEST( serialization_of_forex_rates, serialization) {
     MQL4::RatesData rd;
-    int result = MQL4::read_forex_csv(
-                rd,
+    int result = rd.read_forex_csv(
                 MQL4::MARKET_FOREX_FURTURES,
                 "/home/sean/projects/quants/gom/data/USDJPY1.csv");
     EXPECT_EQ(result, 0);
@@ -128,18 +127,18 @@ TEST( serialization_of_forex_rates, serialization) {
         EXPECT_EQ(t, true);
     }
 
-    MQL4::releaseRates(rd);
+    rd.releaseData();
     EXPECT_EQ((rd.rs.time == 0), true);
     EXPECT_EQ(rd.data.size(), (size_t)0);
     EXPECT_EQ(rd.rs.amount, (size_t)0);
 }
 
 TEST (get_forex_data_from_path, get_forex_data) {
-    int result = MQL4::get_forex_data("/home/sean/projects/quants/gom/data");
+    int result = MQL4::mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
     EXPECT_EQ(result, 0);
 
     std::string symbol_name("USDJPY");
-    MQL4::RatesData* rd = MQL4::getSymbol(MQL4::MARKET_FOREX_FURTURES, symbol_name, MQL4::PERIOD_M1);
+    MQL4::RatesData* rd = MQL4::mapRatesData.getSymbol(MQL4::MARKET_FOREX_FURTURES, symbol_name, MQL4::PERIOD_M1);
     EXPECT_EQ((rd != 0), true);
     EXPECT_EQ(rd->symbol.market, MQL4::MARKET_FOREX_FURTURES);
     EXPECT_EQ(rd->symbol.symbol_name, string("USDJPY"));
@@ -147,7 +146,7 @@ TEST (get_forex_data_from_path, get_forex_data) {
     EXPECT_EQ(rd->data.size(), (size_t)13455);
 
     EXPECT_EQ(MQL4::mapRatesData.size(), (size_t)8);
-    MQL4::releaseRatesFromMap();
+    MQL4::mapRatesData.releaseRatesFromMap();
     EXPECT_EQ(MQL4::mapRatesData.size(), (size_t)0);
 }
 
