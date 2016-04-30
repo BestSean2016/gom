@@ -1,6 +1,6 @@
 #include "mql4-data.h"
 #include "indicator.h"
-
+#include "ta-lib/ta_libc.h"
 
 namespace MQL4 {
 
@@ -26,6 +26,8 @@ double  iMA(
    int             applied_price,    // applied price
    int             shift             // shift
    ) {
+
+
     return (0);
 }
 

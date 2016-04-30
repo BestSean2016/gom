@@ -11,6 +11,8 @@
 #include "mql4-data.h"
 #include "libgom.h"
 
+#include "ta-lib/ta_libc.h"
+
 TEST(ForexStringToTime, Convertions) {
     MQL4::datetime t1 = MQL4::ForexStringToTime("2016.04.08,16:22,108.600,108.601,108.551,108.555,86");
     struct tm lt;
@@ -150,3 +152,37 @@ TEST (get_forex_data_from_path, get_forex_data) {
     EXPECT_EQ(MQL4::mapRatesData.size(), (size_t)0);
 }
 
+
+TEST (TA_MA, test_ta_lib ) {
+    int result = MQL4::mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
+    EXPECT_EQ(result, 0);
+
+    std::string symbol_name("USDJPY");
+    MQL4::RatesData* rd = MQL4::mapRatesData.getSymbol(MQL4::MARKET_FOREX_FURTURES, symbol_name, MQL4::PERIOD_M1);
+    EXPECT_EQ((rd != 0), true);
+
+    double *outReal = new double[rd->rs.size];
+    int outBegIdx, outNBElement;
+    TA_RetCode code = TA_MA( 1,
+                      (int)rd->rs.amount,
+                      rd->rs.close,
+                      10, /* From 1 to 100000 */
+                      TA_MAType_MAMA,
+                      &outBegIdx,
+                      &outNBElement,
+                      outReal );
+
+    ofstream fout("test.csv");
+    for (int i = 0; i < outNBElement; ++i) {
+        if (i < outBegIdx)
+            fout << rd->rs.close[i] << ", " << endl;
+        else
+            fout << rd->rs.close[i] << ", " << outReal[i] << endl;
+    }
+    fout.close();
+
+
+    EXPECT_EQ(code, 0);
+    delete outReal;
+    MQL4::mapRatesData.releaseRatesFromMap();
+}
