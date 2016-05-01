@@ -5,7 +5,6 @@ CONFIG -= qt
 
 INCLUDEPATH += ../include
 INCLUDEPATH += /home/sean/projects/googletest/googletest/include
-INCLUDEPATH += /usr/local/include
 
 LIBS += -L /home/sean/projects/googletest/build/build/googlemock/gtest -lgtest -lgtest_main -lpthread -lta_lib
 

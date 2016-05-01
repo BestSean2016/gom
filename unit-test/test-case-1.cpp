@@ -161,28 +161,74 @@ TEST (TA_MA, test_ta_lib ) {
     MQL4::RatesData* rd = MQL4::mapRatesData.getSymbol(MQL4::MARKET_FOREX_FURTURES, symbol_name, MQL4::PERIOD_M1);
     EXPECT_EQ((rd != 0), true);
 
-    double *outReal = new double[rd->rs.size];
+    double *outTrimaReal = new double[rd->rs.size * 4];
+    double *outSmaReal = outTrimaReal + rd->rs.size;
+    double *outEmaReal = outSmaReal + rd->rs.size;
+    double *outWmaReal = outEmaReal   + rd->rs.size;
+
     int outBegIdx, outNBElement;
-    TA_RetCode code = TA_MA( 1,
-                      (int)rd->rs.amount,
+    int period = 60;
+    TA_RetCode code = TA_MA( 0,
+                      (int)rd->rs.amount - 1,
                       rd->rs.close,
-                      10, /* From 1 to 100000 */
-                      TA_MAType_MAMA,
+                      period, /* From 1 to 100000 */
+                      TA_MAType_TRIMA,
                       &outBegIdx,
                       &outNBElement,
-                      outReal );
+                      outTrimaReal );
+
+    EXPECT_EQ(outBegIdx, period - 1);
+    EXPECT_EQ(outNBElement, (int)rd->rs.amount - outBegIdx);
+
+    code = TA_MA( 0,
+                  (int)rd->rs.amount - 1,
+                  rd->rs.close,
+                  period, /* From 1 to 100000 */
+                  TA_MAType_SMA,
+                  &outBegIdx,
+                  &outNBElement,
+                  outSmaReal );
+
+    EXPECT_EQ(outBegIdx, period - 1);
+    EXPECT_EQ(outNBElement, (int)rd->rs.amount - outBegIdx);
+
+    code = TA_MA( 0,
+                  (int)rd->rs.amount - 1,
+                  rd->rs.close,
+                  period, /* From 1 to 100000 */
+                  TA_MAType_EMA,
+                  &outBegIdx,
+                  &outNBElement,
+                  outEmaReal );
+
+    EXPECT_EQ(outBegIdx, period - 1);
+    EXPECT_EQ(outNBElement, (int)rd->rs.amount - outBegIdx);
+
+    code = TA_MA( 0,
+                  (int)rd->rs.amount - 1,
+                  rd->rs.close,
+                  period, /* From 1 to 100000 */
+                  TA_MAType_WMA,
+                  &outBegIdx,
+                  &outNBElement,
+                  outWmaReal );
+
+    EXPECT_EQ(outBegIdx, period - 1);
+    EXPECT_EQ(outNBElement, (int)rd->rs.amount - outBegIdx);
+
 
     ofstream fout("test.csv");
+    fout << "Close Price, TRIma, Sma, Ema, Wma\n";
     for (int i = 0; i < outNBElement; ++i) {
         if (i < outBegIdx)
-            fout << rd->rs.close[i] << ", " << endl;
+            fout << rd->rs.close[i] << ", " << ", " << ", " << ", " << endl;
         else
-            fout << rd->rs.close[i] << ", " << outReal[i] << endl;
+            fout << rd->rs.close[i] << ", " << outTrimaReal[i] << ", " << outSmaReal[i] << ", " << outEmaReal[i] << ", " << outWmaReal[i] << ", " << endl;
     }
     fout.close();
 
 
     EXPECT_EQ(code, 0);
-    delete outReal;
+    delete outTrimaReal;
     MQL4::mapRatesData.releaseRatesFromMap();
 }
