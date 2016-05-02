@@ -153,7 +153,7 @@ TEST (get_forex_data_from_path, get_forex_data) {
 }
 
 
-TEST (TA_MA, test_ta_lib ) {
+TEST (TA_MA, test_ta_lib_for_ma ) {
     int result = MQL4::mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
     EXPECT_EQ(result, 0);
 
@@ -177,6 +177,7 @@ TEST (TA_MA, test_ta_lib ) {
                       &outNBElement,
                       outTrimaReal );
 
+    EXPECT_EQ(code, 0);
     EXPECT_EQ(outBegIdx, period - 1);
     EXPECT_EQ(outNBElement, (int)rd->rs.amount - outBegIdx);
 
@@ -189,6 +190,7 @@ TEST (TA_MA, test_ta_lib ) {
                   &outNBElement,
                   outSmaReal );
 
+    EXPECT_EQ(code, 0);
     EXPECT_EQ(outBegIdx, period - 1);
     EXPECT_EQ(outNBElement, (int)rd->rs.amount - outBegIdx);
 
@@ -201,6 +203,7 @@ TEST (TA_MA, test_ta_lib ) {
                   &outNBElement,
                   outEmaReal );
 
+    EXPECT_EQ(code, 0);
     EXPECT_EQ(outBegIdx, period - 1);
     EXPECT_EQ(outNBElement, (int)rd->rs.amount - outBegIdx);
 
@@ -213,11 +216,12 @@ TEST (TA_MA, test_ta_lib ) {
                   &outNBElement,
                   outWmaReal );
 
+    EXPECT_EQ(code, 0);
     EXPECT_EQ(outBegIdx, period - 1);
     EXPECT_EQ(outNBElement, (int)rd->rs.amount - outBegIdx);
 
 
-    ofstream fout("test.csv");
+    ofstream fout("test-ma.csv");
     fout << "Close Price, TRIma, Sma, Ema, Wma\n";
     for (int i = 0; i < outNBElement; ++i) {
         if (i < outBegIdx)
@@ -228,7 +232,58 @@ TEST (TA_MA, test_ta_lib ) {
     fout.close();
 
 
+    delete [] outTrimaReal;
+    MQL4::mapRatesData.releaseRatesFromMap();
+}
+
+TEST (TA_MACD, test_ta_lib_for_macd ) {
+    int result = MQL4::mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
+    EXPECT_EQ(result, 0);
+
+    std::string symbol_name("USDJPY");
+    MQL4::RatesData* rd = MQL4::mapRatesData.getSymbol(MQL4::MARKET_FOREX_FURTURES, symbol_name, MQL4::PERIOD_M1);
+    EXPECT_EQ((rd != 0), true);
+
+    double *outMACD_1 = new double[rd->rs.size * 3];
+    double *outMACDSignal_1 = outMACD_1 + rd->rs.size;
+    double *outMACDHist_1 = outMACD_1 + rd->rs.size * 2;
+
+    int outBegIdx, outNBElement;
+    int period = 1;
+    int fastPeriod = 20; /* From 2 to 100000 */
+    int slowPeriod = 40; /* From 2 to 100000 */
+
+    TA_RetCode code = TA_MACD(0,
+                              (int)rd->rs.amount - 1,
+                              rd->rs.close,
+                              fastPeriod,
+                              slowPeriod,
+                              period, /* From 1 to 100000 */
+                              &outBegIdx,
+                              &outNBElement,
+                              outMACD_1,
+                              outMACDSignal_1,
+                              outMACDHist_1 );
+
     EXPECT_EQ(code, 0);
-    delete outTrimaReal;
+    EXPECT_EQ(outBegIdx, slowPeriod - 2);
+    EXPECT_EQ(outNBElement, (int)rd->rs.amount - outBegIdx - 2);
+
+    ofstream fout("test-macd.csv");
+    fout << "Close Price, macd, signal, hist, macd_, signal_, hist_\n";
+    for (int i = 0; i < outNBElement; ++i) {
+        if (i < outBegIdx)
+            fout << rd->rs.close[i] << ", "  << ", " << ", " << endl;
+        else
+            fout << rd->rs.close[i] << ", "
+                 << outMACD_1[i] << ", "
+                 << outMACDSignal_1[i] << ", "
+                 << outMACDHist_1[i]
+                 << endl;
+    }
+    fout.close();
+
+
+    delete [] outMACD_1;
     MQL4::mapRatesData.releaseRatesFromMap();
 }
