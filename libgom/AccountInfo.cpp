@@ -3,7 +3,7 @@
 namespace MQL4 {
 
 double  AccountFreeMargin() {
-    return (0);
+    return (100000000);
 }
 
 }//namespace MQL4

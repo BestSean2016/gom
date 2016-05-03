@@ -110,6 +110,11 @@ enum ENUM_ORDER_MODE {
     MODE_HISTORY, ///- order selected from history pool (closed and canceled order).
 };
 
+enum ENUM_ORDER_STATUS {
+    ENUM_ORDER_STATUS_OPENED,
+    ENUM_ORDER_STATUS_MODIFIED,
+    ENUM_ORDER_STATUS_CLOSED,
+};
 
 /**
  * @breif 客户端与交易服务器执行其他安置操作相互作用，通过使用交易请求来执行。
@@ -147,6 +152,10 @@ typedef struct MqlTradeRequest {
     ENUM_ORDER_TYPE_TIME          type_time;        /// 订单执行时间
     datetime                      expiration;       /// 订单终止期 (为 ORDER_TIME_SPECIFIED 类型订单)
     string                        comment;          /// 订单注释
+    int                           arrow_color;      /// arrow color in chart
+    ENUM_ORDER_STATUS             status;           /// the status of theorder
+    datetime                      sendtime;         /// sending time
+    datetime                      modifytime;       /// modify time
 } MqlTradeRequest;
 
 
@@ -156,7 +165,6 @@ extern VecOrders gOrders;
 extern MapIntToOrders gmapOrders;
 extern MqlTradeRequest* gSelectedOrder;
 
-extern int       gSelectedOrder;
 /**
  * @brief OrdersTotal Returns the number of market and pending orders.
  * @return Total amount of market and pending orders.
@@ -277,15 +285,20 @@ extern double  OrderStopLoss();
 /**
  * @brief OrderModify Modification of characteristics of the previously opened or pending orders.
  * Note
- * Open price and expiration time can be changed only for pending orders. If unchanged values are passed as the function parameters, the error 1 (ERR_NO_RESULT) will be generated.
- * Pending order expiration time can be disabled in some trade servers. In this case, when a non-zero value is specified in the expiration parameter, the error 147 (ERR_TRADE_EXPIRATION_DENIED) will be generated.
+ * Open price and expiration time can be changed only for pending orders. If unchanged values are
+ * passed as the function parameters, the error 1 (ERR_NO_RESULT) will be generated.
+ * Pending order expiration time can be disabled in some trade servers. In this case, when a non-zero
+ *  value is specified in the expiration parameter, the error 147 (ERR_TRADE_EXPIRATION_DENIED) will
+ * be generated.
  * @param ticket [in]  Unique number of the order ticket.
  * @param price [in]  New open price of the pending order.
  * @param stoploss [in]  New StopLoss level.
  * @param takeprofit [in]  New TakeProfit level.
  * @param expiration [in]  Pending order expiration time.
- * @param arrow_color [in]  Arrow color for StopLoss/TakeProfit modifications in the chart. If the parameter is missing or has CLR_NONE value, the arrows will not be shown in the chart.
- * @return If the function succeeds, it returns true, otherwise false. To get the detailed error information, call the GetLastError() function.
+ * @param arrow_color [in]  Arrow color for StopLoss/TakeProfit modifications in the chart. If the
+ *  parameter is missing or has CLR_NONE value, the arrows will not be shown in the chart.
+ * @return If the function succeeds, it returns true, otherwise false. To get the detailed error
+ * information, call the GetLastError() function.
  */
 extern bool  OrderModify(
    int        ticket,      // ticket
@@ -349,7 +362,8 @@ extern bool  OrderClose(
  * @param magic [in]  Order magic number. May be used as user defined identifier. default is 0
  * @param expiration [in]  Order expiration time (for pending orders only).default is 0
  * @param arrow_color [in]  Color of the opening arrow on the chart. If parameter is missing or has CLR_NONE value opening arrow is not drawn on the chart. default is clrNONE
- * @return Returns number of the ticket assigned to the order by the trade server or -1 if it fails. To get additional error information, one has to call the GetLastError() function.
+ * @return Returns number of the ticket assigned to the order by the trade server or -1 if it fails.
+ * To get additional error information, one has to call the GetLastError() function.
  */
 extern int  OrderSend(
    string   symbol,              // symbol
