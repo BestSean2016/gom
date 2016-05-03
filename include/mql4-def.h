@@ -110,8 +110,6 @@ enum ENUM_MA_METHOD {
     MODE_LWMA, //Linear-weighted averaging
 };
 
-#define SELECT_BY_POS 0 //- index in the order pool,
-#define SELECT_BY_TICKET 1 //- index is order ticket.
 
 //Indicator Lines
 //Indicator line identifiers used in iMACD(), iRVI() and iStochastic() indicators.
@@ -134,11 +132,6 @@ enum ENUM_MA_METHOD {
 #define MODE_SENKOUSPANA	3	//Senkou Span A
 #define MODE_SENKOUSPANB	4	//Senkou Span B
 #define MODE_CHIKOUSPAN	    5	//Chikou Span
-
-#define MODE_TRADES  0 //(default)- order selected from trading pool(opened and pending orders),
-#define MODE_HISTORY 1 //- order selected from history pool (closed and canceled order).
-
-
 
 #define OP_BUY	        0	//Buy operation
 #define OP_SELL	        1	//Sell operation

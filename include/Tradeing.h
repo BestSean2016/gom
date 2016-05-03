@@ -31,6 +31,132 @@
 
 namespace MQL4 {
 
+
+/**
+ * @breif 使用OrderSend()函数通过向开仓位置发送命令进行交易，和放置、修改或删除待办
+ * 订单命令一样。每个交易命令引用要求操作类型。交易操作在ENUM_TRADE_REQUEST_ACTIONS
+ * 项目中描述。
+ */
+enum ENUM_TRADE_REQUEST_ACTIONS {
+    TRADE_ACTION_DEAL, ///为规定参数的立即执行放置交易命令（市场命令）
+    TRADE_ACTION_PENDING, ///在制定环境下执行放置交易命令（待办订单）
+    TRADE_ACTION_SLTP, ///修改折仓并取走开仓利润值
+    TRADE_ACTION_MODIFY, ///修改先前放置的命令参量
+    TRADE_ACTION_REMOVE, ///删除先前放置的待办订单命令
+} ;
+
+
+#ifdef ___MQL5___
+enum ENUM_ORDER_TYPE {
+    ORDER_TYPE_BUY            ,   ///市场购买订单
+    ORDER_TYPE_SELL           ,   ///市场卖出订单
+    ORDER_TYPE_BUY_LIMIT      ,   ///限制买入待办订单
+    ORDER_TYPE_SELL_LIMIT     ,   ///限制卖出待办订单
+    ORDER_TYPE_BUY_STOP       ,   ///停止买入待办订单
+    ORDER_TYPE_SELL_STOP      ,   ///停止卖出待办订单
+    ORDER_TYPE_BUY_STOP_LIMIT ,   ///在到达订单价格之上，是限制买入订单安置在停止限制价格中
+    ORDER_TYPE_SELL_STOP_LIMIT,   ///在到达订单价格之上，是限制卖出订单安置在停止限制价格中
+};
+#else //___MQL4___
+enum ENUM_ORDER_TYPE {
+    ORDER_BUY            ,   ///市场购买订单
+    ORDER_SELL           ,   ///市场卖出订单
+    ORDER_BUYLIMIT       ,   ///限制买入待办订单
+    ORDER_SELLLIMIT      ,   ///限制卖出待办订单
+    ORDER_BUYSTOP        ,   ///停止买入待办订单
+    ORDER_SELLSTOP       ,   ///停止卖出待办订单
+    ORDER_BUY_STOP_LIMIT ,   ///在到达订单价格之上，是限制买入订单安置在停止限制价格中
+    ORDER_SELL_STOP_LIMIT,   ///在到达订单价格之上，是限制卖出订单安置在停止限制价格中
+};
+#endif //___MQL5___
+
+
+/**
+ * @brief The ENUM_ORDER_TYPE_FILLING enum
+ * @param ORDER_FILLING_FOK    执行政策意味着订单只可以在指定额度执行。如果当前市场不提供金融工具需要的额度，订单将无法执行。需要的交易量可以使用市场此刻几种可用的提供来执行。
+ * @param ORDER_FILLING_IOC    该模式意味着交易者同意在订单指定范围内，以市场可用的最大交易量执行交易。如果无法执行全部订单交易量，那么剩下的交易量将被取消。
+ * @param ORDER_FILLING_RETURN 该政策只用于市场订单 (ORDER_TYPE_BUY 和 ORDER_TYPE_SELL)，限价和止损限价订单 (ORDER_TYPE_BUY_LIMIT，ORDER_TYPE_SELL_LIMIT，ORDER_TYPE_BUY_STOP_LIMIT 和 ORDER_TYPE_SELL_STOP_LIMIT ) 并且只用于市场或交易 执行的交易品种。如果部分执行市场或剩下交易量的限价订单没有取消，则是会进一步处理。为了激活ORDER_TYPE_BUY_STOP_LIMIT 和 ORDER_TYPE_SELL_STOP_LIMIT 订单，将会创建ORDER_FILLING_RETURN执行类型相应的限价订单 ORDER_TYPE_BUY_LIMIT/ORDER_TYPE_SELL_LIMIT 。
+ */
+enum ENUM_ORDER_TYPE_FILLING {
+    ORDER_FILLING_FOK,
+    ORDER_FILLING_IOC,
+    ORDER_FILLING_RETURN,
+};
+
+
+/**
+ * @brief The ENUM_ORDER_TYPE_TIME enum
+ * @param ORDER_TIME_GTC 取消订单
+ * @param ORDER_TIME_DAY 前交易日订单
+ * @param ORDER_TIME_SPECIFIED 过期订单
+ * @param ORDER_TIME_SPECIFIED_DAY 订单将生效直至指定日期的23:59:59。如果该时间超出了交易期，那么该订单会在最近的交易时间内到期。
+ */
+enum ENUM_ORDER_TYPE_TIME {
+    ORDER_TIME_GTC,
+    ORDER_TIME_DAY,
+    ORDER_TIME_SPECIFIED,
+    ORDER_TIME_SPECIFIED_DAY,
+};
+
+
+enum ENUM_SELECT_BY_TYPE {
+    SELECT_BY_POS,    ///index is order ticket
+    SELECT_BY_TICKET, ///index in the order pool
+};
+
+
+enum ENUM_ORDER_MODE {
+    MODE_TRADES , ///(default)- order selected from trading pool(opened and pending orders),
+    MODE_HISTORY, ///- order selected from history pool (closed and canceled order).
+};
+
+
+/**
+ * @breif 客户端与交易服务器执行其他安置操作相互作用，通过使用交易请求来执行。
+ *        交易请求由特殊预定MqlTradeRequest类型的结构来体现，包含必要的执行交易订单。
+ *        该请求执行结果由MqlTradeResult的类型结构来表示.
+ * @param action 交易操作类型，可以是 ENUM_TRADE_REQUEST_ACTIONS 项目值中的一个。
+ * @param magic EA交易ID，允许操作分析交易命令过程，当发送交易请求时，每个EA交易都能建立自己独特的ID
+ * @param order 命令按钮，用来修改待办订单。
+ * @param symbol 交易品种命令，不需要修改命令和关闭放置操作。
+ * @param volume 要求命令成交手数，标识每笔订单真实成交量取决于订单执行类型。
+ * @param price 价格，必须执行到达命令，交易品种的市场底单，它的执行类型是“市场执行”（SYMBOL_TRADE_EXECUTION_MARKET） ， TRADE_ACTION_DEAL 类型，不要求价格说明。
+ * @param stoplimit 价格价值，当价格达到price值时（必要条件），Limit安置待办订单，直到待办订单部能安置。
+ * @param sl 在不利于价格活动的情况下的止损数值
+ * @param tp 在优惠价格活动的情况下目标数值
+ * @param deviation 最大价格偏差，指定在 points 中
+ * @param type 命令类型，可以是 ENUM_ORDER_TYPE项目值中的一个
+ * @param type_filling 命令执行类型，可以是 ENUM_ORDER_TYPE_FILLING 项目值中的一个
+ * @param type_time 命令终结类型，可以是 ENUM_ORDER_TYPE_TIME 项目值中的一个
+ * @param expiration 命令终结期限（ ORDER_TIME_SPECIFIED 命令类型）
+ * @param comment 命令注解文本
+ */
+typedef struct MqlTradeRequest {
+    ENUM_TRADE_REQUEST_ACTIONS    action;           /// 交易操作类型
+    ulong                         magic;            /// EA交易 ID (魔幻数字)
+    ulong                         order;            /// 订单号
+    string                        symbol;           /// 交易的交易品种
+    double                        volume;           /// 一手需求的交易量
+    double                        price;            /// 价格
+    double                        stoplimit;        /// 订单止损限价点位
+    double                        sl;               /// 订单止损价位点位
+    double                        tp;               /// 订单盈利价位点位
+    ulong                         deviation;        /// 需求价格最可能的偏差
+    ENUM_ORDER_TYPE               type;             /// 订单类型
+    ENUM_ORDER_TYPE_FILLING       type_filling;     /// 订单执行类型
+    ENUM_ORDER_TYPE_TIME          type_time;        /// 订单执行时间
+    datetime                      expiration;       /// 订单终止期 (为 ORDER_TIME_SPECIFIED 类型订单)
+    string                        comment;          /// 订单注释
+} MqlTradeRequest;
+
+
+typedef std::vector<MqlTradeRequest*> VecOrders;
+typedef std::map<int, MqlTradeRequest*> MapIntToOrders;
+extern VecOrders gOrders;
+extern MapIntToOrders gmapOrders;
+extern MqlTradeRequest* gSelectedOrder;
+
+extern int       gSelectedOrder;
 /**
  * @brief OrdersTotal Returns the number of market and pending orders.
  * @return Total amount of market and pending orders.
@@ -71,6 +197,8 @@ extern int  OrdersTotal();
  * @return It returns true if the function succeeds, otherwise falses. To get the error information,
  *         one has to call the GetLastError() function.
  */
+
+
 extern bool  OrderSelect(
    int     index,            // index or order ticket
    int     select,           // flag
@@ -130,7 +258,7 @@ extern int  OrderTicket();
  * The order must be previously selected by the OrderSelect() function.
  * @return Amount of lots (trade volume) of the selected order.
  */
-double  OrderLots();
+extern double  OrderLots();
 
 
 
@@ -140,7 +268,7 @@ double  OrderLots();
  * The order must be previously selected by the OrderSelect() function.
  * @return Stop loss value of the currently selected order.
  */
-double  OrderStopLoss();
+extern double  OrderStopLoss();
 
 
 
@@ -159,7 +287,7 @@ double  OrderStopLoss();
  * @param arrow_color [in]  Arrow color for StopLoss/TakeProfit modifications in the chart. If the parameter is missing or has CLR_NONE value, the arrows will not be shown in the chart.
  * @return If the function succeeds, it returns true, otherwise false. To get the detailed error information, call the GetLastError() function.
  */
-bool  OrderModify(
+extern bool  OrderModify(
    int        ticket,      // ticket
    double     price,       // price
    double     stoploss,    // stop loss
@@ -177,7 +305,7 @@ bool  OrderModify(
  * The order must be previously selected by the OrderSelect() function.
  * @return Take profit value of the currently selected order.
  */
-double  OrderTakeProfit();
+extern double  OrderTakeProfit();
 
 
 
@@ -190,7 +318,7 @@ double  OrderTakeProfit();
  * @param arrow_color [in]  Color of the closing arrow on the chart. If the parameter is missing or has CLR_NONE value closing arrow will not be drawn on the chart.
  * @return Returns true if successful, otherwise false. To get additional error information, one has to call the GetLastError() function.
  */
-bool  OrderClose(
+extern bool  OrderClose(
    int        ticket,      // ticket
    double     lots,        // volume
    double     price,       // close price
@@ -223,7 +351,7 @@ bool  OrderClose(
  * @param arrow_color [in]  Color of the opening arrow on the chart. If parameter is missing or has CLR_NONE value opening arrow is not drawn on the chart. default is clrNONE
  * @return Returns number of the ticket assigned to the order by the trade server or -1 if it fails. To get additional error information, one has to call the GetLastError() function.
  */
-int  OrderSend(
+extern int  OrderSend(
    string   symbol,              // symbol
    int      cmd,                 // operation
    double   volume,              // volume
@@ -237,6 +365,14 @@ int  OrderSend(
    color    arrow_color=clrNONE  // color
    );
 
+
+/**
+ * @brief destroyOrders delete all order, vector, map, ... etc in memory.
+ */
+extern void destroyOrders();
+
+
+extern MqlTradeRequest* findInOrderMap(MapIntToOrders& mapOrders, int ticket);
 
 } //namespace MQL4
 

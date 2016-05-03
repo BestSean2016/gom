@@ -2,8 +2,12 @@
 
 namespace MQL4 {
 
+VecOrders        gOrders;
+MapIntToOrders   gmapOrders;
+MqlTradeRequest* gSelectedOrder = 0;
+
 int OrdersTotal() {
-    return (0);
+    return static_cast<int>(gOrders.size());
 }
 
 bool  OrderSelect(
@@ -12,6 +16,15 @@ bool  OrderSelect(
    int     pool              // mode
 )
 {
+    if (select == SELECT_BY_POS) {
+        if (index < 0 || index > static_cast<int>(gOrders.size()))
+            return false;
+        gSelectedOrder = gOrders[index];
+    } else if (select == SELECT_BY_TICKET) {
+        findInOrderMap(gmapOrders, index);
+    } else
+        return false;
+
     return true;
 }
 
@@ -85,5 +98,16 @@ int  OrderSend(
     return (0);
 }
 
+void destroyOrders() {
+    gmapOrders.clear();
+    for (auto &p : gOrders)
+        delete p;
+    gOrders .clear();
+}
+
+
+MqlTradeRequest* findInOrderMap(MapIntToOrders &mapOrders, int ticket) {
+
+}
 
 } //namespace MQL4
