@@ -71,8 +71,6 @@ Thumbs.db
 *.dll
 *.exe
 
-./build
-./build/*
-!build/
+/build
 *.pro.user
 
