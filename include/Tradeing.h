@@ -136,26 +136,29 @@ enum ENUM_ORDER_STATUS {
  * @param expiration 命令终结期限（ ORDER_TIME_SPECIFIED 命令类型）
  * @param comment 命令注解文本
  */
+
+
+
 typedef struct MqlTradeRequest {
-    ENUM_TRADE_REQUEST_ACTIONS    action;           /// 交易操作类型
-    ulong                         magic;            /// EA交易 ID (魔幻数字)
-    ulong                         order;            /// 订单号
-    string                        symbol;           /// 交易的交易品种
-    double                        volume;           /// 一手需求的交易量
-    double                        price;            /// 价格
-    double                        stoplimit;        /// 订单止损限价点位
-    double                        sl;               /// 订单止损价位点位
-    double                        tp;               /// 订单盈利价位点位
-    ulong                         deviation;        /// 需求价格最可能的偏差
-    ENUM_ORDER_TYPE               type;             /// 订单类型
-    ENUM_ORDER_TYPE_FILLING       type_filling;     /// 订单执行类型
-    ENUM_ORDER_TYPE_TIME          type_time;        /// 订单执行时间
-    datetime                      expiration;       /// 订单终止期 (为 ORDER_TIME_SPECIFIED 类型订单)
-    string                        comment;          /// 订单注释
-    int                           arrow_color;      /// arrow color in chart
-    ENUM_ORDER_STATUS             status;           /// the status of theorder
-    datetime                      sendtime;         /// sending time
-    datetime                      modifytime;       /// modify time
+    ENUM_TRADE_REQUEST_ACTIONS action;               /// 交易操作类型
+    ulong                      magic;                /// EA交易 ID (魔幻数字)
+    ulong                      order;                /// 订单号
+    string                     symbol;               /// 交易的交易品种
+    double                     volume;               /// 一手需求的交易量
+    double                     price;                /// 价格
+    double                     stoplimit;            /// 订单止损限价点位
+    double                     sl;                   /// 订单止损价位点位
+    double                     tp;                   /// 订单盈利价位点位
+    ulong                      deviation;            /// 需求价格最可能的偏差
+    ENUM_ORDER_TYPE            type;                 /// 订单类型
+    ENUM_ORDER_TYPE_FILLING    type_filling;         /// 订单执行类型
+    ENUM_ORDER_TYPE_TIME       type_time;            /// 订单执行时间
+    datetime                   expiration;           /// 订单终止期 (为 ORDER_TIME_SPECIFIED 类型订单)
+    string                     comment;              /// 订单注释
+    int                        arrow_color;          /// arrow color in chart
+    ENUM_ORDER_STATUS          status;               /// the status of theorder
+    datetime                   sendtime;             /// sending time
+    datetime                   modifytime;           /// modify time
 } MqlTradeRequest;
 
 
@@ -194,7 +197,7 @@ extern int  OrdersTotal();
  * Consecutive selection of orders using the SELECT_BY_POS parameter returns information in the sequence in which
  *  it was received from the trading server. Sorting of the resulting list of orders cannot be guaranteed.
  *
- * @param index [in]  Order index or order ticket depending on the second parameter.
+ * @param index [in]  Order index or order ticket depending on the second parameter. index from 1
  * @param select [in]  Selecting flags. It can be any of the following values:
  *                     SELECT_BY_POS - index in the order pool,
  *                     SELECT_BY_TICKET - index is order ticket.
@@ -373,7 +376,7 @@ extern int  OrderSend(
    int      slippage,            // slippage
    double   stoploss,            // stop loss
    double   takeprofit,          // take profit
-   string   comment=NULL,        // comment
+   string   comment="",        // comment
    int      magic=0,             // magic number
    datetime expiration=0,        // pending order expiration
    color    arrow_color=clrNONE  // color

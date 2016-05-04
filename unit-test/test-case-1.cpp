@@ -12,6 +12,7 @@
 #include "libgom.h"
 
 #include "ta-lib/ta_libc.h"
+#include "Tradeing.h"
 
 TEST(ForexStringToTime, Convertions) {
     MQL4::datetime t1 = MQL4::ForexStringToTime("2016.04.08,16:22,108.600,108.601,108.551,108.555,86");
@@ -286,4 +287,74 @@ TEST (TA_MACD, test_ta_lib_for_macd ) {
 
     delete [] outMACD_1;
     MQL4::mapRatesData.releaseRatesFromMap();
+}
+
+TEST (ORDER, test_order) {
+    /*string   symbol,              // symbol
+    int      cmd,                 // operation
+    double   volume,              // volume
+    double   price,               // price
+    int      slippage,            // slippage
+    double   stoploss,            // stop loss
+    double   takeprofit,          // take profit
+    string   comment=NULL,        // comment
+    int      magic=0,             // magic number
+    datetime expiration=0,        // pending order expiration
+    color    arrow_color=clrNONE  // color*/
+    int ticket = MQL4::OrderSend(
+                      "USDJPY",
+                      MQL4::ORDER_BUY,
+                      41,
+                      12.3,
+                      1,
+                      9.0,
+                      18.0);
+
+    EXPECT_EQ(MQL4::gOrders.size(), (size_t)1);
+    MQL4::MqlTradeRequest* order = MQL4::findInOrderMap(MQL4::gmapOrders, ticket);
+
+    EXPECT_EQ(order->type, MQL4::ORDER_BUY);
+    EXPECT_EQ(order->price, 12.3);
+    EXPECT_EQ(order->sl, 9.0);
+    EXPECT_EQ(order->tp, 18.0);
+    EXPECT_EQ(order->symbol, "USDJPY");
+    EXPECT_EQ(order->volume, 41);
+    EXPECT_EQ(order->deviation, (unsigned long)1);
+    EXPECT_EQ(order->status, MQL4::ENUM_ORDER_STATUS_OPENED);
+
+    bool t = MQL4::OrderSelect(1, MQL4::SELECT_BY_POS);
+    EXPECT_EQ(t, true);
+    EXPECT_EQ(order, MQL4::gSelectedOrder);
+
+
+    t = MQL4::OrderModify(ticket, 12.8, 8.0, 20.0, 0, clrNONE);
+    EXPECT_EQ(t, true);
+    EXPECT_EQ(order->type, MQL4::ORDER_BUY);
+    EXPECT_EQ(order->price, 12.8);
+    EXPECT_EQ(order->sl, 8.0);
+    EXPECT_EQ(order->tp, 20.0);
+    EXPECT_EQ(order->symbol, "USDJPY");
+    EXPECT_EQ(order->volume, 41);
+    EXPECT_EQ(order->deviation, (unsigned long)1);
+    EXPECT_EQ(order->status, MQL4::ENUM_ORDER_STATUS_MODIFIED);
+
+    t = MQL4::OrderClose(ticket, 20, 14.8, 1, clrNONE);
+    EXPECT_EQ(t, true);
+    EXPECT_EQ(order->type, MQL4::ORDER_BUY);
+    EXPECT_EQ(order->price, 12.8);
+    EXPECT_EQ(order->sl, 8.0);
+    EXPECT_EQ(order->tp, 20.0);
+    EXPECT_EQ(order->symbol, "USDJPY");
+    EXPECT_EQ(order->volume, 41);
+    EXPECT_EQ(order->deviation, (unsigned long)1);
+    EXPECT_EQ(order->status, MQL4::ENUM_ORDER_STATUS_CLOSED);
+
+    EXPECT_EQ(MQL4::gOrders.size(), (unsigned long)2);
+    t = MQL4::OrderSelect(2, MQL4::SELECT_BY_POS);
+    EXPECT_EQ(t, true);
+    EXPECT_NE(order, MQL4::gSelectedOrder);
+
+    order = MQL4::gSelectedOrder;
+
+    MQL4::destroyOrders();
 }

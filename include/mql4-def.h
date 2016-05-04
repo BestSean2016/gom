@@ -168,6 +168,7 @@ enum ENUM_MA_METHOD {
 #define CHAR_PATH_SPERATOR '/'
 
 
+
 } //namespace MQL4
 
 

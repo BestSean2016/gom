@@ -14,7 +14,22 @@ SOURCES += \
     ../libgom/randomwalk.cpp \
     ../libgom/indicator.cpp \
     ../libgom/mql4-data.cpp \
-    ../libgom/datetime.cpp
+    ../libgom/datetime.cpp \
+    ../libgom/Trading.cpp
 
 HEADERS += \
-    /home/sean/projects/googletest/googletest/include/gtest/gtest.h
+    /home/sean/projects/googletest/googletest/include/gtest/gtest.h \
+    ../include/Tradeing.h \
+    ../include/AccountInfo.h \
+    ../include/Checkup.h \
+    ../include/Conversion.h \
+    ../include/datetime.h \
+    ../include/indicator.h \
+    ../include/libgom.h \
+    ../include/Math.h \
+    ../include/mql4-data.h \
+    ../include/mql4-def.h \
+    ../include/stderror-mql4.h \
+    ../include/stdlib-mql4.h \
+    ../include/string-ops.h \
+    ../include/TimeSeries.h

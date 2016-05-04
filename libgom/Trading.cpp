@@ -23,9 +23,9 @@ bool  OrderSelect(
     (void)pool;
 
     if (select == SELECT_BY_POS) {
-        if (index < 0 || index > static_cast<int>(gOrders.size()))
+        if (index < 1 || index > static_cast<int>(gOrders.size()))
             return false;
-        gSelectedOrder = gOrders[index];
+        gSelectedOrder = gOrders[index - 1];
     } else if (select == SELECT_BY_TICKET) {
         gSelectedOrder = findInOrderMap(gmapOrders, index);
         return (gSelectedOrder != 0);
@@ -110,7 +110,6 @@ bool  OrderClose(
         return false;
     else {
         MqlTradeRequest* mtrClose = new MqlTradeRequest;
-        memcpy(mtrClose, mtr, sizeof(MqlTradeRequest));
         mtrClose->order = ++gticket;
         mtrClose->magic = mtr->order;
         mtrClose->volume = lots;
@@ -120,6 +119,19 @@ bool  OrderClose(
         mtrClose->status = ENUM_ORDER_STATUS_CLOSED;
         mtr->modifytime = mtrClose->modifytime = mtrClose->sendtime = time(0);
         mtr->status = ENUM_ORDER_STATUS_CLOSED;
+
+        mtrClose->action       = mtr->action;               /// 交易操作类型
+        mtrClose->magic        = mtr->magic;                /// EA交易 ID (魔幻数字)
+        mtrClose->symbol       = mtr->symbol;               /// 交易的交易品种
+        mtrClose->stoplimit    = mtr->stoplimit;            /// 订单止损限价点位
+        mtrClose->sl           = mtr->sl;                   /// 订单止损价位点位
+        mtrClose->tp           = mtr->tp;                   /// 订单盈利价位点位
+        mtrClose->type         = mtr->type;                 /// 订单类型
+        mtrClose->type_filling = mtr->type_filling;         /// 订单执行类型
+        mtrClose->type_time    = mtr->type_time   ;         /// 订单执行时间
+        mtrClose->expiration   = mtr->expiration  ;         /// 订单终止期 (为 ORDER_TIME_SPECIFIED 类型订单)
+        mtrClose->comment      = mtr->comment     ;         /// 订单注释
+        mtrClose->sendtime     = mtr->sendtime    ;         /// sending time
 
         gOrders.push_back(mtrClose);
         gmapOrders.insert(std::pair<int, MqlTradeRequest*>(mtrClose->order, mtrClose));
@@ -140,7 +152,7 @@ int  OrderSend(
    int      magic,               // magic number
    datetime expiration,          // pending order expiration
    color    arrow_color          // color
-   ) {
+) {
     MqlTradeRequest* mtr = new MqlTradeRequest;
     mtr->symbol = symbol;
     mtr->type = (ENUM_ORDER_TYPE)cmd;
@@ -156,7 +168,8 @@ int  OrderSend(
     mtr->order = gticket++;
     mtr->sendtime = time(0);
     mtr->modifytime = 0;
-    mtr->status = ENUM_ORDER_STATUS_OPENED;
+    mtr->status = ENUM_ORDER_STATUS_OPENED;\
+    mtr->action = TRADE_ACTION_DEAL;
 
     gOrders.push_back(mtr);
     gmapOrders.insert(std::pair<int, MqlTradeRequest*>(mtr->order, mtr));
@@ -165,9 +178,13 @@ int  OrderSend(
 }
 
 void destroyOrders() {
+    for (auto &p : gmapOrders)
+        delete (p.second);
+
     gmapOrders.clear();
-    for (auto &p : gOrders)
-        delete p;
+    //for (size_t i = 0; i < gOrders.size(); ++i) {
+    //    delete gOrders[i];
+    //}
     gOrders .clear();
 }
 
