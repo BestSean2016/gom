@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 INCLUDEPATH += ../include
+LIBS += -lpthread -lta_lib
 
 SOURCES += main.cpp \
     MACD_Sample.cpp \
