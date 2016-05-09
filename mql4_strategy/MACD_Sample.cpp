@@ -5,6 +5,14 @@
 //+------------------------------------------------------------------+
 #include "stderror-mql4.h"
 #include "stdlib-mql4.h"
+
+#include "mql4-def.h"
+#include "mql4-data.h"
+#include "libgom.h"
+
+#include "ta-lib/ta_libc.h"
+#include "Tradeing.h"
+
 #include "indicator.h"
 
 #define copyright   "2005-2014, MetaQuotes Software Corp."
@@ -26,6 +34,14 @@ static double _Point = 0;
 using namespace MQL4;
 
 
+void OnInit(void) {
+    MQL4::mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
+}
+
+void OnDeinit(void) {
+    MQL4::mapRatesData.releaseRatesFromMap();
+    MQL4::destroyOrders();
+}
 
 //+------------------------------------------------------------------+
 //|                                                                  |

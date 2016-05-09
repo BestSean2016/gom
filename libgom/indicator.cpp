@@ -32,7 +32,7 @@ double  iMA(
 }
 
 double  iMACD(
-   string       symbol,           // symbol
+   const char*  symbol,           // symbol
    int          timeframe,        // timeframe
    int          fast_ema_period,  // Fast EMA period
    int          slow_ema_period,  // Slow EMA period
@@ -41,7 +41,35 @@ double  iMACD(
    int          mode,             // line index
    int          shift             // shift
    ) {
-    return (0);
+    string the_symbol;
+    if (symbol == NULL)
+        the_symbol = "USDJPY";
+    else
+        the_symbol = symbol;
+
+    RatesData* rates = MQL4::mapRatesData.getSymbol(MARKET_FOREX_FURTURES, the_symbol, (ENUM_TIMEFRAMES)timeframe);
+
+    double *outMACD = new double[rd->rs.size * 3];
+    double *outMACDSignal = outMACD + rd->rs.size;
+    double *outMACDHist   = outMACD + rd->rs.size * 2;
+
+    int outBegIdx, outNBElement;
+    double *inData = getInputData(rates, applied_price);
+
+    TA_RetCode code = TA_MACD(0,
+                              (int)rates->rs.amount - 1,
+                              inData,
+                              fast_ema_period,
+                              slow_ema_period,
+                              signal_period,
+                              &outBegIdx,
+                              &outNBElement,
+                              outMACD,
+                              outMACDSignal,
+                              outMACDHist );
+
+    delete outMACD;
+    return (mode == MODE_MAIN) ? outMACD[] : outMACDSignal[];
 }
 
 } //namespace MQL4

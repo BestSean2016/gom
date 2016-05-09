@@ -68,8 +68,7 @@ double  iMA(
  * @return Numerical value of the Moving Average of Oscillator indicator.
  */
 
-double  iMACD(
-   string       symbol,           // symbol
+double  iMACD(const char *symbol,           // symbol
    int          timeframe,        // timeframe
    int          fast_ema_period,  // Fast EMA period
    int          slow_ema_period,  // Slow EMA period
