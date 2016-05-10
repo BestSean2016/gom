@@ -7,9 +7,22 @@ namespace MQL4 {
 VecOrders        gOrders;
 MapIntToOrders   gmapOrders;
 MqlTradeRequest* gSelectedOrder = 0;
-
+string           gSelectedSymbol = "USDJPY";
+RatesData*       gSelectedData = 0;
 
 static unsigned int gticket = 100000;
+
+
+bool selectSymbol(const char* symbol, ENUM_TIMEFRAMES timeframe) {
+    string the_symbol;
+    if (symbol == NULL)
+        the_symbol = gSelectedSymbol;
+    else
+        the_symbol = symbol;
+
+    gSelectedData = mapRatesData.getSymbol(MARKET_FOREX_FURTURES, the_symbol, timeframe);
+    return (gSelectedData != 0);
+}
 
 int OrdersTotal() {
     return static_cast<int>(gOrders.size());

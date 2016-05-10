@@ -5,6 +5,7 @@ CONFIG -= qt
 
 
 INCLUDEPATH += ../include
+LIBS += -lpthread -lta_lib
 
 SOURCES += datagen.cpp \
     ../libgom/getopt.cpp \

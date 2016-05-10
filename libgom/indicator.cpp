@@ -1,36 +1,10 @@
 #include "mql4-data.h"
 #include "indicator.h"
 #include "ta-lib/ta_libc.h"
+#include "Tradeing.h"
+
 
 namespace MQL4 {
-
-
-int  iBars(
-   string           symbol,          // symbol
-   ENUM_TIMEFRAMES  timeframe        // timeframe
-   ) {
-    RatesData* rates = MQL4::mapRatesData.getSymbol(MARKET_FOREX_FURTURES, symbol, timeframe);
-    if (!rates)
-        return (0);
-    else
-        return static_cast<int>(rates->rs.amount);
-}
-
-
-double  iMA(
-   string          symbol,           // symbol
-   ENUM_TIMEFRAMES timeframe,        // timeframe
-   int             ma_period,        // MA averaging period
-   int             ma_shift,         // MA shift
-   int             ma_method,        // averaging method
-   int             applied_price,    // applied price
-   int             shift             // shift
-   ) {
-
-
-    return (0);
-}
-
 
 static double * getInputData(const RatesData* rates, int applied_price) {
     double * ptr = 0;
@@ -52,6 +26,78 @@ static double * getInputData(const RatesData* rates, int applied_price) {
     return (ptr);
 }
 
+int  iBars(
+   string           symbol,          // symbol
+   ENUM_TIMEFRAMES  timeframe        // timeframe
+   ) {
+    gSelectedData = MQL4::mapRatesData.getSymbol(MARKET_FOREX_FURTURES, symbol, timeframe);
+    if (!gSelectedData)
+        return (0);
+    else
+        return static_cast<int>(gSelectedData->rs.amount);
+}
+
+
+double  iMA(
+   const char *    symbol,           // symbol
+   ENUM_TIMEFRAMES timeframe,        // timeframe
+   int             ma_period,        // MA averaging period
+   int             ma_shift,         // MA shift
+   int             ma_method,        // averaging method
+   int             applied_price,    // applied price
+   int             shift             // shift
+   ) {
+    MQL4::RatesData* rd = MQL4::gSelectedData;
+    if (symbol != 0) {
+        string the_symbol(symbol);
+        rd = MQL4::mapRatesData.getSymbol(MARKET_CHINA_FURTURES, the_symbol, (ENUM_TIMEFRAMES)timeframe);
+    }
+
+    int outBegIdx, outNBElement;
+    double *outReal = new double[rd->rs.size];
+    double *inData = getInputData(rd, applied_price);
+
+    //
+    // check ma_shift less than rs.amount
+    //
+    /*
+     ENUM_DEFINE( TA_MAType_SMA,   Sma   ) =0,
+     ENUM_DEFINE( TA_MAType_EMA,   Ema   ) =1,
+     ENUM_DEFINE( TA_MAType_WMA,   Wma   ) =2,
+     ENUM_DEFINE( TA_MAType_DEMA,  Dema  ) =3,
+     ENUM_DEFINE( TA_MAType_TEMA,  Tema  ) =4,
+     ENUM_DEFINE( TA_MAType_TRIMA, Trima ) =5,
+     ENUM_DEFINE( TA_MAType_KAMA,  Kama  ) =6,
+     ENUM_DEFINE( TA_MAType_MAMA,  Mama  ) =7,
+     ENUM_DEFINE( TA_MAType_T3,    T3    ) =8
+    */
+
+    /*
+     MODE_SMA, 0 //Simple averaging
+     MODE_EMA, 1 //Exponential averaging
+     MODE_SMMA,2 //Smoothed averaging
+     MODE_LWMA,3 //Linear-weighted averaging
+    */
+
+    //
+    //to to mapping
+    //
+    TA_MA( ma_shift,
+           (int)rd->rs.amount - 1,
+           inData + ma_shift,
+           ma_period,
+           (TA_MAType)ma_method,
+           &outBegIdx,
+           &outNBElement,
+           outReal );
+
+    double retval = outReal[outNBElement - 1 - shift];
+    delete outReal;
+
+    return retval;
+}
+
+
 double  iMACD(
    const char*  symbol,           // symbol
    int          timeframe,        // timeframe
@@ -62,13 +108,11 @@ double  iMACD(
    int          mode,             // line index
    int          shift             // shift
    ) {
-    string the_symbol;
-    if (symbol == NULL)
-        the_symbol = "USDJPY";
-    else
-        the_symbol = symbol;
-
-    RatesData* rates = MQL4::mapRatesData.getSymbol(MARKET_FOREX_FURTURES, the_symbol, (ENUM_TIMEFRAMES)timeframe);
+    MQL4::RatesData* rates = MQL4::gSelectedData;
+    if (symbol != 0) {
+        string the_symbol(symbol);
+        rates = MQL4::mapRatesData.getSymbol(MARKET_CHINA_FURTURES, the_symbol, (ENUM_TIMEFRAMES)timeframe);
+    }
 
     double *outMACD = new double[rates->rs.size * 3];
     double *outMACDSignal = outMACD + rates->rs.size;
@@ -79,24 +123,28 @@ double  iMACD(
 
     //TA_RetCode code = TA_MACD(0,
     TA_MACD(0,
-                              (int)rates->rs.amount - 1,
-                              inData,
-                              fast_ema_period,
-                              slow_ema_period,
-                              signal_period,
-                              &outBegIdx,
-                              &outNBElement,
-                              outMACD,
-                              outMACDSignal,
-                              outMACDHist );
-
-    delete outMACD;
+            (int)rates->rs.amount - 1,
+            inData,
+            fast_ema_period,
+            slow_ema_period,
+            signal_period,
+            &outBegIdx,
+            &outNBElement,
+            outMACD,
+            outMACDSignal,
+            outMACDHist );
 
     //
     // to do check the shift must less than amount
     //
 
-    return (mode == MODE_MAIN) ? outMACD[rates->rs.amount - 1 - shift] : outMACDSignal[rates->rs.amount - 1 - shift];
+    double retval = (mode == MODE_MAIN) ?
+                outMACD[outNBElement - 1 - shift]
+                :
+                outMACDSignal[outNBElement - 1 - shift];
+
+    delete outMACD;
+    return retval;
 }
 
 } //namespace MQL4

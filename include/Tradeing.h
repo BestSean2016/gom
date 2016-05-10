@@ -2,6 +2,7 @@
 #define TRADEING_H
 
 #include "mql4-def.h"
+#include "mql4-data.h"
 
 //OrderClose Closes opened order
 //OrderCloseBy Closes an opened order by another opposite opened order
@@ -167,6 +168,8 @@ typedef std::map<int, MqlTradeRequest*> MapIntToOrders;
 extern VecOrders gOrders;
 extern MapIntToOrders gmapOrders;
 extern MqlTradeRequest* gSelectedOrder;
+extern string           gSelectedSymbol;
+extern RatesData*       gSelectedData;
 
 /**
  * @brief OrdersTotal Returns the number of market and pending orders.
@@ -390,6 +393,8 @@ extern void destroyOrders();
 
 
 extern MqlTradeRequest* findInOrderMap(MapIntToOrders& mapOrders, int ticket);
+extern bool selectSymbol(const char* symbol, ENUM_TIMEFRAMES timeframe = PERIOD_M1);
+
 
 } //namespace MQL4
 

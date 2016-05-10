@@ -7,6 +7,9 @@ string  DoubleToStr(
    int     digits     // precision
    )
 {
+    (void)value;
+    (void)digits;
+
     char buf[64];
     snprintf(buf, 64, "%f", value);
     return buf;
@@ -18,6 +21,9 @@ string  IntegerToString(
    int     str_len,           // length of result string
    ushort  fill_symbol        // filler
    ) {
+    (void)str_len;
+    (void)fill_symbol;
+
     char buf[64];
     snprintf(buf, 64, "%ld", number);
     return buf;
@@ -26,6 +32,7 @@ string  IntegerToString(
 
 //Rounding floating point number to a specified accuracy.
 double NormalizeDouble(double value, int digits) {
+    (void)digits;
     return value;
 }
 

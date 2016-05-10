@@ -39,8 +39,7 @@ int  iBars(
  * @param shift [in]  Index of the value taken from the indicator buffer (shift relative to the current bar the given amount of periods ago).
  * @return Numerical value of the Moving Average indicator.
  */
-double  iMA(
-   string          symbol,           // symbol
+double  iMA(const char *symbol,           // symbol
    ENUM_TIMEFRAMES timeframe,        // timeframe
    int             ma_period,        // MA averaging period
    int             ma_shift,         // MA shift
