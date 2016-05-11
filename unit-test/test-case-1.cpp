@@ -361,5 +361,25 @@ TEST (ORDER, test_order) {
 }
 
 TEST(bars, test_bars) {
+    int result = MQL4::mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
+    EXPECT_EQ(result, 0);
+
     int Bars_ = MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
+    bool t = (MQL4::gSelectedData != 0);
+    EXPECT_EQ(t, true);
+    EXPECT_EQ(Bars_, 13455);
+
+    int    MATrendPeriod =26;
+
+    double MacdCurrent=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_MAIN,0);
+    double MacdPrevious=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_MAIN,1);
+    double SignalCurrent=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_SIGNAL,0);
+    double SignalPrevious=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_SIGNAL,1);
+    double MaCurrent=iMA(NULL,MQL4::PERIOD_CURRENT,MATrendPeriod,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,0);
+    double MaPrevious=iMA(NULL,MQL4::PERIOD_CURRENT,MATrendPeriod,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,1);
+
+    cout << MacdCurrent << ", " << MacdPrevious << ", " << SignalCurrent << ", " << SignalPrevious << endl;
+    cout << MaCurrent << ", " << MaPrevious << endl;
+
+    MQL4::mapRatesData.releaseRatesFromMap();
 }
