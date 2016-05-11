@@ -144,7 +144,7 @@ double  iMACD(
                 :
                 outMACDSignal[outNBElement - 1 - shift];
 
-    delete outMACD;
+    delete [] outMACD;
     return retval;
 }
 

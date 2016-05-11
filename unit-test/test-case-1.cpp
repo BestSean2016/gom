@@ -369,17 +369,22 @@ TEST(bars, test_bars) {
     EXPECT_EQ(t, true);
     EXPECT_EQ(Bars_, 13455);
 
-    int    MATrendPeriod =26;
-
     double MacdCurrent=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_MAIN,0);
-    double MacdPrevious=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_MAIN,1);
-    double SignalCurrent=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_SIGNAL,0);
-    double SignalPrevious=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_SIGNAL,1);
-    double MaCurrent=iMA(NULL,MQL4::PERIOD_CURRENT,MATrendPeriod,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,0);
-    double MaPrevious=iMA(NULL,MQL4::PERIOD_CURRENT,MATrendPeriod,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,1);
+    // double MacdPrevious=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_MAIN,1);
+    // double SignalCurrent=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_SIGNAL,0);
+    // double SignalPrevious=iMACD(NULL,0,12,26,9,MQL4::PRICE_CLOSE,MODE_SIGNAL,1);
+    // double MaCurrent=iMA(NULL, MQL4::PERIOD_M1,26 ,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,0);
+    // double MaPrevious=iMA(NULL,MQL4::PERIOD_M1,26 ,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,1);
 
-    cout << MacdCurrent << ", " << MacdPrevious << ", " << SignalCurrent << ", " << SignalPrevious << endl;
-    cout << MaCurrent << ", " << MaPrevious << endl;
+    EXPECT_LT(abs(MacdCurrent    - 0.000360627), 0.0000001);
+    // EXPECT_LT(abs(MacdPrevious   - 0.00082818 ), 0.0000001);
+    // EXPECT_LT(abs(SignalCurrent  - 0.000994764), 0.0000001);
+    // EXPECT_LT(abs(SignalPrevious - 0.001153298), 0.0000001);
+    // EXPECT_LT(abs(MaCurrent  - 109.448948062), 0.0000001);
+    // EXPECT_LT(abs(MaPrevious - 109.449263907), 0.0000001);
+
+    // printf("%.09f, %.09f, %.09f, %.09f, %.09f, %.09f\n",
+    //        MacdCurrent, MacdPrevious, SignalCurrent, SignalPrevious, MaCurrent, MaPrevious);
 
     MQL4::mapRatesData.releaseRatesFromMap();
 }
