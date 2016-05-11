@@ -15,10 +15,8 @@ SOURCES += main.cpp \
     ../libgom/getopt.cpp \
     ../libgom/indicator.cpp \
     ../libgom/Math.cpp \
-    ../libgom/randomwalk.cpp \
     ../libgom/stdlib-mql4.cpp \
     ../libgom/string-ops.cpp \
-    ../libgom/TimeSeries.cpp \
     ../libgom/Trading.cpp \
     ../libgom/mql4-data.cpp
 

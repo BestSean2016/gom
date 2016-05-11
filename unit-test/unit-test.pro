@@ -11,7 +11,6 @@ LIBS += -L /home/sean/projects/googletest/build/build/googlemock/gtest -lgtest -
 SOURCES += \
     test-case-1.cpp \
     ../libgom/getopt.cpp \
-    ../libgom/randomwalk.cpp \
     ../libgom/indicator.cpp \
     ../libgom/mql4-data.cpp \
     ../libgom/datetime.cpp \
@@ -31,5 +30,4 @@ HEADERS += \
     ../include/mql4-def.h \
     ../include/stderror-mql4.h \
     ../include/stdlib-mql4.h \
-    ../include/string-ops.h \
-    ../include/TimeSeries.h
+    ../include/string-ops.h

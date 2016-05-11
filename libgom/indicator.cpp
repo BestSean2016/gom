@@ -27,10 +27,11 @@ static double * getInputData(const RatesData* rates, int applied_price) {
 }
 
 int  iBars(
-   string           symbol,          // symbol
-   ENUM_TIMEFRAMES  timeframe        // timeframe
+   const char* symbol,          // symbol
+   int         timeframe        // timeframe
    ) {
-    gSelectedData = MQL4::mapRatesData.getSymbol(MARKET_FOREX_FURTURES, symbol, timeframe);
+    string s(symbol);
+    gSelectedData = MQL4::mapRatesData.getSymbol(MARKET_FOREX_FURTURES, s, (MQL4::ENUM_TIMEFRAMES)timeframe);
     if (!gSelectedData)
         return (0);
     else

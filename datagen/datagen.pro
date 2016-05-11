@@ -9,7 +9,6 @@ LIBS += -lpthread -lta_lib
 
 SOURCES += datagen.cpp \
     ../libgom/getopt.cpp \
-    ../libgom/randomwalk.cpp \
     ../libgom/datetime.cpp \
     ../libgom/indicator.cpp \
     ../libgom/stdlib-mql4.cpp \
@@ -18,7 +17,6 @@ SOURCES += datagen.cpp \
     ../libgom/Conversion.cpp \
     ../libgom/Math.cpp \
     ../libgom/string-ops.cpp \
-    ../libgom/TimeSeries.cpp \
     ../libgom/Trading.cpp \
     ../libgom/mql4-data.cpp
 

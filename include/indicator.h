@@ -7,6 +7,7 @@ using namespace std;
 
 namespace MQL4 {
 
+
 /**
  * @brief iBars Returns the number of bars on the specified chart.
  * Note
@@ -17,10 +18,9 @@ namespace MQL4 {
  * @param timeframe [in]  Timeframe. It can be any of ENUM_TIMEFRAMES enumeration values. 0 means the current chart timeframe.
  * @return The number of bars on the specified chart.
  */
-int  iBars(
-   string           symbol,          // symbol
-   int              timeframe        // timeframe
-   );
+extern int  iBars(const char *     symbol,          // symbol
+                  int              timeframe        // timeframe
+                  );
 
 
 
@@ -39,14 +39,14 @@ int  iBars(
  * @param shift [in]  Index of the value taken from the indicator buffer (shift relative to the current bar the given amount of periods ago).
  * @return Numerical value of the Moving Average indicator.
  */
-double  iMA(const char *symbol,           // symbol
-   ENUM_TIMEFRAMES timeframe,        // timeframe
-   int             ma_period,        // MA averaging period
-   int             ma_shift,         // MA shift
-   int             ma_method,        // averaging method
-   int             applied_price,    // applied price
-   int             shift             // shift
-   );
+extern double  iMA(const char *symbol,           // symbol
+                   ENUM_TIMEFRAMES timeframe,        // timeframe
+                   int             ma_period,        // MA averaging period
+                   int             ma_shift,         // MA shift
+                   int             ma_method,        // averaging method
+                   int             applied_price,    // applied price
+                   int             shift             // shift
+                   );
 
 
 /**
@@ -67,15 +67,15 @@ double  iMA(const char *symbol,           // symbol
  * @return Numerical value of the Moving Average of Oscillator indicator.
  */
 
-double  iMACD(const char *symbol,           // symbol
-   int          timeframe,        // timeframe
-   int          fast_ema_period,  // Fast EMA period
-   int          slow_ema_period,  // Slow EMA period
-   int          signal_period,    // Signal line period
-   int          applied_price,    // applied price
-   int          mode,             // line index
-   int          shift             // shift
-   );
+extern double  iMACD(const char *symbol,           // symbol
+                     int          timeframe,        // timeframe
+                     int          fast_ema_period,  // Fast EMA period
+                     int          slow_ema_period,  // Slow EMA period
+                     int          signal_period,    // Signal line period
+                     int          applied_price,    // applied price
+                     int          mode,             // line index
+                     int          shift             // shift
+                     );
 
 
 

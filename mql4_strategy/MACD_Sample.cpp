@@ -18,18 +18,18 @@
 #define copyright   "2005-2014, MetaQuotes Software Corp."
 #define link        "http://www.mql4.com"
 
-static double TakeProfit    =50;
-static double Lots          =0.1;
-static double TrailingStop  =30;
-static double MACDOpenLevel =3;
-static double MACDCloseLevel=2;
-static int    MATrendPeriod =26;
+double TakeProfit    =50;
+double Lots          =0.1;
+double TrailingStop  =30;
+double MACDOpenLevel =3;
+double MACDCloseLevel=2;
+int    MATrendPeriod =26;
 
-static int Bars_ = 0;
-static double Bid_ = 0;
-static double Ask_ = 0;
+int Bars_ = 0;
+double Bid_ = 0;
+double Ask_ = 0;
 
-static double _Point = 0;
+double _Point = 0;
 
 using namespace MQL4;
 

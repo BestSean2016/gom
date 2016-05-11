@@ -12,6 +12,7 @@
 #include "libgom.h"
 
 #include "ta-lib/ta_libc.h"
+#include "indicator.h"
 #include "Tradeing.h"
 
 TEST(ForexStringToTime, Convertions) {
@@ -357,4 +358,8 @@ TEST (ORDER, test_order) {
     order = MQL4::gSelectedOrder;
 
     MQL4::destroyOrders();
+}
+
+TEST(bars, test_bars) {
+    int Bars_ = MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
 }
