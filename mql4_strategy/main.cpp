@@ -15,29 +15,20 @@
 
 using namespace std;
 
-extern double TakeProfit    ;
-extern double Lots          ;
-extern double TrailingStop  ;
-extern double MACDOpenLevel ;
-extern double MACDCloseLevel;
-extern int    MATrendPeriod ;
-
-extern int    Bars_ ;
-extern double Bid_  ;
-extern double Ask_  ;
-extern double _Point;
-
 extern void OnInit();
 extern void OnDeinit();
 extern void OnTick();
+extern void OnCalculateSomething();
 
 int main()
 {
     OnInit();
 
-    Bars_ = MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
+    int nBars = MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
 
-    for (int i = 0; i < Bars_; i++) {
+    for (int i = 0; i < nBars; i++) {
+        MQL4::setCurrentDataPos(i);
+        OnCalculateSomething();
         OnTick();
     }
 

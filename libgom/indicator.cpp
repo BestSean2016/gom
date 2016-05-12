@@ -5,6 +5,9 @@
 
 
 namespace MQL4 {
+static int gCurrentDataPos = 0;
+
+void setCurrentDataPos(int pos) {gCurrentDataPos = pos;}
 
 static double * getInputData(const RatesData* rates, int applied_price) {
     double * ptr = 0;
@@ -55,7 +58,7 @@ double  iMA(
     }
 
     int outBegIdx, outNBElement;
-    double *outReal = new double[rd->rs.size];
+    double *outReal = new double[gCurrentDataPos + 1];
     double *inData = getInputData(rd, applied_price);
 
     //
@@ -84,7 +87,7 @@ double  iMA(
     //to to mapping
     //
     TA_MA( ma_shift,
-           (int)rd->rs.amount - 1,
+           gCurrentDataPos, //(int)rd->rs.amount - 1,
            inData + ma_shift,
            ma_period,
            (TA_MAType)ma_method,
@@ -93,7 +96,7 @@ double  iMA(
            outReal );
 
     double retval = outReal[outNBElement - 1 - shift];
-    delete outReal;
+    delete [] outReal;
 
     return retval;
 }
@@ -115,16 +118,16 @@ double  iMACD(
         rates = MQL4::mapRatesData.getSymbol(MARKET_CHINA_FURTURES, the_symbol, (ENUM_TIMEFRAMES)timeframe);
     }
 
-    double *outMACD = new double[rates->rs.size * 3];
-    double *outMACDSignal = outMACD + rates->rs.size;
-    double *outMACDHist   = outMACD + rates->rs.size * 2;
+    double *outMACD = new double[(gCurrentDataPos + 1) * 3];
+    double *outMACDSignal = outMACD + (gCurrentDataPos + 1);
+    double *outMACDHist   = outMACDSignal + (gCurrentDataPos + 1);
 
     int outBegIdx, outNBElement;
     double *inData = getInputData(rates, applied_price);
 
     //TA_RetCode code = TA_MACD(0,
     TA_MACD(0,
-            (int)rates->rs.amount - 1,
+            gCurrentDataPos, //(int)rates->rs.amount - 1
             inData,
             fast_ema_period,
             slow_ema_period,
@@ -147,5 +150,9 @@ double  iMACD(
     delete [] outMACD;
     return retval;
 }
+
+
+double Bid() { return 0; }
+double Ask() { return 0; }
 
 } //namespace MQL4
