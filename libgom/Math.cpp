@@ -53,8 +53,11 @@ bool   MathBasicStatistics(const double* value, const uint count, BASIC_STATISTI
     statistics.count = count;
 
     double sum = 0;
-    for (uint i = 0; i < count; ++i)
+    for (uint i = 0; i < count; ++i) {
         sum += value[i];
+        statistics.min = min(statistics.min, value[i]);
+        statistics.max = max(statistics.max, value[i]);
+    }
 
     statistics.mean = sum / static_cast<double>(count);
 

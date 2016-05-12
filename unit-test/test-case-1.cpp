@@ -385,6 +385,14 @@ TEST(bars, test_bars) {
     EXPECT_LT(abs(MaCurrent  - 109.448948062), 0.0000001);
     EXPECT_LT(abs(MaPrevious - 109.449263907), 0.0000001);
 
+    EXPECT_EQ(MQL4::gSelectedData->rs.stat.count, 13455);
+    EXPECT_LT(MQL4::gSelectedData->rs.stat.mean - 108.913630546, 0.0000001);
+    EXPECT_LT(MQL4::gSelectedData->rs.stat.stdv - 0.563896570, 0.0000001);
+    EXPECT_LT(MQL4::gSelectedData->rs.stat.var - 0.317979342  , 0.0000001);
+    EXPECT_LT(MQL4::gSelectedData->rs.stat.max - 109.886000000, 0.0000001);
+    EXPECT_LT(MQL4::gSelectedData->rs.stat.min - 107.665000000, 0.0000001);
+
+
     // printf("%.09f, %.09f, %.09f, %.09f, %.09f, %.09f\n",
     //        MacdCurrent, MacdPrevious, SignalCurrent, SignalPrevious, MaCurrent, MaPrevious);
 
