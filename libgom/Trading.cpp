@@ -79,6 +79,11 @@ double  OrderStopLoss() {
 }
 
 
+void forex_simulator_new_data(const RatesData* rd) {
+    if (!rd) return;
+
+}
+
 bool  OrderModify(
    int        ticket,      // ticket
    double     price,       // price

@@ -3,6 +3,7 @@
 
 
 #include "mql4-def.h"
+#include "Math.h"
 
 namespace MQL4 {
 
@@ -71,6 +72,7 @@ typedef struct RatesSerial {
     double   * low;          // The lowest price of the period
     double   * close;        // Close price
     ulong    * tick_volume;  // Tick volume
+    BASIC_STATISTICS  stat;
 } RatesSerial;
 
 typedef std::vector<MqlRates> RatesVector;

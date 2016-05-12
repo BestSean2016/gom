@@ -19,6 +19,7 @@ extern void OnInit();
 extern void OnDeinit();
 extern void OnTick();
 extern void OnCalculateSomething();
+extern void OnNewData();
 
 int main()
 {
@@ -28,7 +29,8 @@ int main()
 
     for (int i = 0; i < nBars; i++) {
         MQL4::setCurrentDataPos(i);
-        OnCalculateSomething();
+        forex_simulator_new_data(MQL4::gSelectedData);
+        OnNewData();
         OnTick();
     }
 

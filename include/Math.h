@@ -1,6 +1,8 @@
 #ifndef MATH_H
 #define MATH_H
 
+#include <sys/types.h>
+#include <limits>
 #include <math.h>
 
 namespace MQL4 {
@@ -53,6 +55,17 @@ extern void   MathSrand(unsigned int seed);
 extern double MathTan          (double value);
 extern bool   MathIsValidNumber(double value);
 
+
+typedef struct BASIC_STATISTICS {
+    int count;
+    double mean;
+    double var;
+    double stdv;
+    double min;
+    double max;
+}BASIC_STATISTICS;
+
+extern bool   MathBasicStatistics(const double* value, const uint count, BASIC_STATISTICS& statistics);
 
 } //namespace MQL4
 

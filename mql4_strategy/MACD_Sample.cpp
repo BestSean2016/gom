@@ -43,7 +43,7 @@ void OnDeinit(void) {
     MQL4::destroyOrders();
 }
 
-void OnCalculateSomething() {
+void OnNewData() {
     Bars_ = static_cast<int>(MQL4::gSelectedData->data.size());
     Bid_ = MQL4::Bid();
     Ask_ = MQL4::Ask();

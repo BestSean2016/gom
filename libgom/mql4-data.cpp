@@ -155,6 +155,8 @@ int RatesData::serializateRates(size_t newDataAmount) {
         rs.tick_volume[i] = data[i].tick_volume;
     }
 
+    MathBasicStatistics(rs.close, data.size(), rs.stat);
+
     return (0);
 }
 

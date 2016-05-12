@@ -14,7 +14,8 @@ SOURCES += \
     ../libgom/indicator.cpp \
     ../libgom/mql4-data.cpp \
     ../libgom/datetime.cpp \
-    ../libgom/Trading.cpp
+    ../libgom/Trading.cpp \
+    ../libgom/Math.cpp
 
 HEADERS += \
     /home/sean/projects/googletest/googletest/include/gtest/gtest.h \

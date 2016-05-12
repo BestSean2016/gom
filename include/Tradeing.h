@@ -395,6 +395,8 @@ extern void destroyOrders();
 extern MqlTradeRequest* findInOrderMap(MapIntToOrders& mapOrders, int ticket);
 extern bool selectSymbol(const char* symbol, ENUM_TIMEFRAMES timeframe = PERIOD_M1);
 
+extern void forex_simulator_new_data(const RatesData* rd);
+
 
 } //namespace MQL4
 

@@ -1,5 +1,6 @@
 #include "stderror-mql4.h"
 #include "stdlib-mql4.h"
+
 #include "Math.h"
 
 namespace MQL4 {
@@ -42,5 +43,30 @@ double MathSqrt         (double value) {return sqrt(value);}
 void   MathSrand        (unsigned int seed) {srand(seed);}
 double MathTan          (double value) {return tan(value);}
 bool   MathIsValidNumber(double value) {return (bool)isnan(value);}
+
+
+bool   MathBasicStatistics(const double* value, const uint count, BASIC_STATISTICS& statistics) {
+    if (!value || !count) return false;
+    struct numeric_limits<double> nl;
+    statistics.min = nl.max();
+    statistics.max = nl.min();
+    statistics.count = count;
+
+    double sum = 0;
+    for (uint i = 0; i < count; ++i)
+        sum += value[i];
+
+    statistics.mean = sum / static_cast<double>(count);
+
+    sum = 0;
+    for (uint i = 0; i < count; ++i)
+        sum += ((value[i] - statistics.mean) * (value[i] - statistics.mean));
+
+    statistics.var  = sum / static_cast<double>(count - 1);
+    statistics.stdv = sqrt(statistics.var);
+
+    return true;
+}
+
 
 } //namespace MQL4
