@@ -32,5 +32,6 @@ HEADERS += \
     ../include/Math.h \
     ../include/string-ops.h \
     ../include/Tradeing.h \
-    ../include/indicator.h
+    ../include/indicator.h \
+    ../include/mql4-data.h
 

@@ -72,4 +72,39 @@ bool   MathBasicStatistics(const double* value, const uint count, BASIC_STATISTI
 }
 
 
+void MathGaussianNoise(double mu, double sigma, double *array, size_t n)
+{
+    const double epsilon = std::numeric_limits<double>::min();
+    const double two_pi = 2.0*3.14159265358979323846;
+
+    double u1, u2;
+
+    double* ptr = array;
+    for (size_t i = 0; i < n; ++i, ++ptr) {
+        do {
+           u1 = rand() * (1.0 / RAND_MAX);
+           u2 = rand() * (1.0 / RAND_MAX);
+        } while ( u1 <= epsilon );
+
+        *ptr = (sqrt(-2.0 * log(u1)) * cos(two_pi * u2)) * sigma + mu;
+    }
+}
+
+void MathGaussianNoise2(double mu, double sigma, double* v1, double* v2) {
+    const double epsilon = std::numeric_limits<double>::min();
+    const double two_pi = 2.0*3.14159265358979323846;
+
+    double u1, u2;
+
+    do {
+       u1 = rand() * (1.0 / RAND_MAX);
+       u2 = rand() * (1.0 / RAND_MAX);
+    } while ( u1 <= epsilon );
+
+    *v1 = (sqrt(-2.0 * log(u1)) * cos(two_pi * u2)) * sigma + mu;
+    *v2 = (sqrt(-2.0 * log(u1)) * sin(two_pi * u2)) * sigma + mu;
+}
+
+
+
 } //namespace MQL4

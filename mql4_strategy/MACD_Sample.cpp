@@ -35,6 +35,7 @@ using namespace MQL4;
 
 
 void OnInit(void) {
+    srand(time(0));
     MQL4::mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
 }
 

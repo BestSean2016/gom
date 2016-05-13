@@ -144,8 +144,16 @@ int RatesData::serializateRates(size_t newDataAmount) {
     rs.close = rs.low  + rs.size;
     rs.tick_volume = reinterpret_cast<ulong*>(rs.close + rs.size);
 
+    struct numeric_limits<double> nl;
+    rs.statPrice.min = rs.statVolume.min =
+            rs.statPriceDelta.min = rs.statVolumeDelta.min = nl.max();
+    rs.statPrice.max = rs.statVolume.max = rs.statPriceDelta.max =
+            rs.statVolumeDelta.max = rs.statVolumeDelta.max = nl.min();
+    rs.statPrice.count = rs.statVolume.count = data.size();
 
-    for (size_t i = 0; i < data.size(); ++i) {
+    double sumPrice = 0, sumVolume = 0, sumPriceDelta = 0, sumVolumeDelta = 0;
+
+    for (size_t i = 0; i < rs.statPrice.count; ++i) {
         rs.open[i]  = data[i].open ,
         rs.close[i] = data[i].close,
         rs.open[i]  = data[i].open ,
@@ -153,9 +161,51 @@ int RatesData::serializateRates(size_t newDataAmount) {
         rs.low[i]   = data[i].low  ,
         rs.time[i]  = data[i].time ,
         rs.tick_volume[i] = data[i].tick_volume;
+
+        sumPrice += rs.close[i];
+        sumVolume += rs.tick_volume[i];
+        rs.statPrice.max = max(rs.statPrice.max, rs.close[i]);
+        rs.statPrice.min = min(rs.statPrice.min, rs.close[i]);
+        rs.statVolume.max = max(rs.statVolume.max, static_cast<double>(rs.tick_volume[i]));
+        rs.statVolume.min = min(rs.statVolume.min, static_cast<double>(rs.tick_volume[i]));
+
+        if (i > 0) {
+            sumPriceDelta += (rs.close[i] - rs.close[i - 1]);
+            sumVolumeDelta += (rs.tick_volume[i] - rs.tick_volume[i - 1]);
+
+            rs.statPriceDelta.max = max(rs.statPriceDelta.max, (rs.close[i] - rs.close[i - 1]));
+            rs.statPriceDelta.min = min(rs.statPriceDelta.min, (rs.close[i] - rs.close[i - 1]));
+            rs.statVolumeDelta.max = max(rs.statVolumeDelta.max, static_cast<double>(rs.tick_volume[i] - rs.tick_volume[i - 1]));
+            rs.statVolumeDelta.min = min(rs.statVolumeDelta.min, static_cast<double>(rs.tick_volume[i] - rs.tick_volume[i - 1]));
+        }
     }
 
-    MathBasicStatistics(rs.close, data.size(), rs.stat);
+    rs.statPrice.mean  = sumPrice  / static_cast<double>(rs.statPrice.count);
+    rs.statVolume.mean = sumVolume /static_cast<double>(rs.statVolume.count);
+    rs.statPriceDelta.mean  = sumPriceDelta / static_cast<double>(rs.statPrice.count - 1);
+    rs.statVolumeDelta.mean = sumVolumeDelta / static_cast<double>(rs.statPrice.count - 1);
+
+    sumPrice = sumVolume = sumPriceDelta = sumVolumeDelta = 0;
+    for (uint i = 0; i < rs.statPrice.count; ++i) {
+         sumPrice += (rs.close[i] - rs.statPrice.mean) * (rs.close[i] - rs.statPrice.mean);
+        sumVolume += (rs.tick_volume[i] - rs.statVolume.mean) * (rs.tick_volume[i] - rs.statVolume.mean);
+
+        if (i > 0) {
+            sumPriceDelta += ((rs.close[i] - rs.close[i - 1]) - rs.statPriceDelta.mean)
+                    * ((rs.close[i] - rs.close[i - 1]) - rs.statPriceDelta.mean);
+            sumVolumeDelta += (static_cast<double>(rs.tick_volume[i] - rs.tick_volume[i - 1]) - rs.statVolumeDelta.mean)
+                    * (static_cast<double>(rs.tick_volume[i] - rs.tick_volume[i - 1]) - rs.statVolumeDelta.mean);
+        }
+    }
+
+    rs.statPrice.var   = sumPrice / static_cast<double>(rs.statPrice.count - 1);
+    rs.statPrice.stdv  = sqrt(rs.statPrice.var);
+    rs.statVolume.var  = sumPrice / static_cast<double>(rs.statPrice.count - 1);
+    rs.statVolume.stdv = sqrt(rs.statVolume.var);
+    rs.statPriceDelta.var = sumPriceDelta / static_cast<double>(rs.statPrice.count - 2);
+    rs.statPriceDelta.stdv = sqrt(rs.statPriceDelta.var);
+    rs.statVolumeDelta.var = sumVolumeDelta / static_cast<double>(rs.statVolume.count - 2);
+    rs.statVolumeDelta.stdv = sqrt(rs.statVolumeDelta.var);
 
     return (0);
 }

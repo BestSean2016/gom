@@ -72,7 +72,10 @@ typedef struct RatesSerial {
     double   * low;          // The lowest price of the period
     double   * close;        // Close price
     ulong    * tick_volume;  // Tick volume
-    BASIC_STATISTICS  stat;
+    BASIC_STATISTICS  statPrice;
+    BASIC_STATISTICS  statVolume;
+    BASIC_STATISTICS  statPriceDelta;
+    BASIC_STATISTICS  statVolumeDelta;
 } RatesSerial;
 
 typedef std::vector<MqlRates> RatesVector;

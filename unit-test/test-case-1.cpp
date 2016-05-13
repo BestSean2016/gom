@@ -360,7 +360,7 @@ TEST (ORDER, test_order) {
     MQL4::destroyOrders();
 }
 
-TEST(bars, test_bars) {
+TEST(Indicator, test_indicator) {
     int result = MQL4::mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
     EXPECT_EQ(result, 0);
 
@@ -378,20 +378,23 @@ TEST(bars, test_bars) {
     double MaCurrent=iMA(NULL, MQL4::PERIOD_M1,26 ,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,0);
     double MaPrevious=iMA(NULL,MQL4::PERIOD_M1,26 ,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,1);
 
-    EXPECT_LT(abs(MacdCurrent    - 0.000360627), 0.0000001);
-    EXPECT_LT(abs(MacdPrevious   - 0.00082818 ), 0.0000001);
-    EXPECT_LT(abs(SignalCurrent  - 0.000994764), 0.0000001);
-    EXPECT_LT(abs(SignalPrevious - 0.001153298), 0.0000001);
-    EXPECT_LT(abs(MaCurrent  - 109.448948062), 0.0000001);
-    EXPECT_LT(abs(MaPrevious - 109.449263907), 0.0000001);
+    EXPECT_LT(abs(MacdCurrent    - 0.000360627), 0.00000001);
+    EXPECT_LT(abs(MacdPrevious   - 0.00082818 ), 0.00000001);
+    EXPECT_LT(abs(SignalCurrent  - 0.000994764), 0.00000001);
+    EXPECT_LT(abs(SignalPrevious - 0.001153298), 0.00000001);
+    EXPECT_LT(abs(MaCurrent  - 109.448948062), 0.00000001);
+    EXPECT_LT(abs(MaPrevious - 109.449263907), 0.00000001);
 
-    EXPECT_EQ(MQL4::gSelectedData->rs.stat.count, 13455);
-    EXPECT_LT(MQL4::gSelectedData->rs.stat.mean - 108.913630546, 0.0000001);
-    EXPECT_LT(MQL4::gSelectedData->rs.stat.stdv - 0.563896570, 0.0000001);
-    EXPECT_LT(MQL4::gSelectedData->rs.stat.var - 0.317979342  , 0.0000001);
-    EXPECT_LT(MQL4::gSelectedData->rs.stat.max - 109.886000000, 0.0000001);
-    EXPECT_LT(MQL4::gSelectedData->rs.stat.min - 107.665000000, 0.0000001);
+    EXPECT_EQ(MQL4::gSelectedData->rs.statPrice.count, static_cast<size_t>(13455));
+    EXPECT_LT(MQL4::gSelectedData->rs.statPrice.mean - 108.913630546, 0.00000001);
+    EXPECT_LT(MQL4::gSelectedData->rs.statPrice.stdv - 0.563896570, 0.00000001);
+    EXPECT_LT(MQL4::gSelectedData->rs.statPrice.var - 0.317979342  , 0.00000001);
+    EXPECT_LT(MQL4::gSelectedData->rs.statPrice.max - 109.886000000, 0.00000001);
+    EXPECT_LT(MQL4::gSelectedData->rs.statPrice.min - 107.665000000, 0.00000001);
 
+    MQL4::TickVector ticks;
+
+    result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, 500);
 
     // printf("%.09f, %.09f, %.09f, %.09f, %.09f, %.09f\n",
     //        MacdCurrent, MacdPrevious, SignalCurrent, SignalPrevious, MaCurrent, MaPrevious);

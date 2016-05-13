@@ -79,9 +79,42 @@ double  OrderStopLoss() {
 }
 
 
-void forex_simulator_new_data(const RatesData* rd) {
-    if (!rd) return;
+int forex_simulator_new_data(TickVector& ticks, const RatesData* rd, int len) {
+    if (!rd) return (-1);
 
+    datetime ltime = rd->rs.time[rd->rs.amount - 1];
+    double delta[6];
+    for (int i = 0; i < len; ++i) {
+        MqlTick tick;
+        MathGaussianNoise3(delta, rd->rs.statPrice.mean, rd->rs.statPrice.stdv);
+        MathGaussianNoise3(delta + 3, rd->rs.statVolume.mean, rd->rs.statVolume.stdv);
+
+        if (i) {
+            tick.ask[0]  = delta[0] + ticks[i - 1].ask[0];
+            tick.bid[0]  = delta[1] + ticks[i - 1].bid[0];
+            tick.last    = delta[2] + ticks[i - 1].last;
+            tick.ask_volume[0] = delta[3] + ticks[i - 1].ask_volume[0];
+            tick.bid_volume[0] = delta[4] + ticks[i - 1].bid_volume[0];
+            tick.last_volume   = delta[5] + ticks[i - 1].last_volume;
+        } else {
+            tick.ask[0]  = delta[0] + rd->rs.close[rd->rs.amount - 1];
+            tick.bid[0]  = delta[1] + rd->rs.close[rd->rs.amount - 1];
+            tick.last    = delta[2] + rd->rs.close[rd->rs.amount - 1];
+            tick.ask_volume[0]  = delta[3] + rd->rs.tick_volume[rd->rs.amount - 1];
+            tick.bid_volume[0]  = delta[4] + rd->rs.tick_volume[rd->rs.amount - 1];
+            tick.last_volume    = delta[5] + rd->rs.tick_volume[rd->rs.amount - 1];
+        }
+
+        tick.time = ltime;
+        ltime += 1;
+        ticks.push_back(tick);
+    }
+
+    return (0);
+}
+
+void releaseTickVector(TickVector& ticks) {
+    ticks.clear();
 }
 
 bool  OrderModify(

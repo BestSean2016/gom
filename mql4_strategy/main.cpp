@@ -26,14 +26,18 @@ int main()
     OnInit();
 
     int nBars = MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
+    MQL4::TickVector ticks;
 
-    for (int i = 0; i < nBars; i++) {
-        MQL4::setCurrentDataPos(i);
-        forex_simulator_new_data(MQL4::gSelectedData);
-        OnNewData();
-        OnTick();
+    int result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, 500);
+    if (!result) {
+        for (int i = 0; i < nBars; i++) {
+            MQL4::setCurrentDataPos(i);
+            OnNewData();
+            OnTick();
+        }
     }
 
+    MQL4::releaseTickVector(ticks);
     OnDeinit();
     return 0;
 }
