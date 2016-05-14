@@ -77,23 +77,13 @@ void MathGaussianNoise3(T* v, double mu, double sigma, size_t n = 3) {
     double u1, u2;
     (void)n;
 
-    do {
-       u1 = rand() * (1.0 / RAND_MAX);
-       u2 = rand() * (1.0 / RAND_MAX);
-    } while ( u1 <= epsilon );
-
-    v[0] = static_cast<T>((sqrt(-2.0 * log(u1)) * cos(two_pi * u2)) * sigma + mu);
-    v[1] = static_cast<T>((sqrt(-2.0 * log(u1)) * sin(two_pi * u2)) * sigma + mu);
-
-    if (v[0] > 4000000)
-        std::cout << v[0] << ", " << v[1] << std::endl;
-
-    do {
-       u1 = rand() * (1.0 / RAND_MAX);
-       u2 = rand() * (1.0 / RAND_MAX);
-    } while ( u1 <= epsilon );
-
-    v[2] = static_cast<T>((sqrt(-2.0 * log(u1)) * cos(two_pi * u2)) * sigma + mu);
+    for (size_t i = 0; i < n; ++i) {
+        do {
+           u1 = rand() * (1.0 / RAND_MAX);
+           u2 = rand() * (1.0 / RAND_MAX);
+        } while ( u1 <= epsilon );
+        v[i] = static_cast<T>((sqrt(-2.0 * log(u1)) * sin(two_pi * u2)) * sigma + mu);
+    }
 }
 
 } //namespace MQL4
