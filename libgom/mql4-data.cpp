@@ -149,9 +149,11 @@ int RatesData::serializateRates(size_t newDataAmount) {
             rs.statPriceDelta.min = rs.statVolumeDelta.min = nl.max();
     rs.statPrice.max = rs.statVolume.max = rs.statPriceDelta.max =
             rs.statVolumeDelta.max = rs.statVolumeDelta.max = nl.min();
-    rs.statPrice.count = rs.statVolume.count = data.size();
+    rs.statPrice.count = rs.statVolume.count
+            = rs.statPriceDelta.count = rs.statVolumeDelta.count = data.size();
 
     double sumPrice = 0, sumVolume = 0, sumPriceDelta = 0, sumVolumeDelta = 0;
+    double priceDelta = 0, volumeDelta = 0;
 
     for (size_t i = 0; i < rs.statPrice.count; ++i) {
         rs.open[i]  = data[i].open ,
@@ -170,13 +172,16 @@ int RatesData::serializateRates(size_t newDataAmount) {
         rs.statVolume.min = min(rs.statVolume.min, static_cast<double>(rs.tick_volume[i]));
 
         if (i > 0) {
-            sumPriceDelta += (rs.close[i] - rs.close[i - 1]);
-            sumVolumeDelta += (rs.tick_volume[i] - rs.tick_volume[i - 1]);
+            priceDelta = rs.close[i] - rs.close[i - 1];
+            sumPriceDelta += priceDelta;
+            volumeDelta = static_cast<double>(static_cast<int>(rs.tick_volume[i])
+                                              - static_cast<int>(rs.tick_volume[i - 1]));
+            sumVolumeDelta += volumeDelta;
 
-            rs.statPriceDelta.max = max(rs.statPriceDelta.max, (rs.close[i] - rs.close[i - 1]));
-            rs.statPriceDelta.min = min(rs.statPriceDelta.min, (rs.close[i] - rs.close[i - 1]));
-            rs.statVolumeDelta.max = max(rs.statVolumeDelta.max, static_cast<double>(rs.tick_volume[i] - rs.tick_volume[i - 1]));
-            rs.statVolumeDelta.min = min(rs.statVolumeDelta.min, static_cast<double>(rs.tick_volume[i] - rs.tick_volume[i - 1]));
+            rs.statPriceDelta.max = max(rs.statPriceDelta.max, priceDelta);
+            rs.statPriceDelta.min = min(rs.statPriceDelta.min, priceDelta);
+            rs.statVolumeDelta.max = max(rs.statVolumeDelta.max, volumeDelta);
+            rs.statVolumeDelta.min = min(rs.statVolumeDelta.min, volumeDelta);
         }
     }
 
@@ -188,19 +193,25 @@ int RatesData::serializateRates(size_t newDataAmount) {
     sumPrice = sumVolume = sumPriceDelta = sumVolumeDelta = 0;
     for (uint i = 0; i < rs.statPrice.count; ++i) {
          sumPrice += (rs.close[i] - rs.statPrice.mean) * (rs.close[i] - rs.statPrice.mean);
-        sumVolume += (rs.tick_volume[i] - rs.statVolume.mean) * (rs.tick_volume[i] - rs.statVolume.mean);
+        sumVolume += (static_cast<double>(rs.tick_volume[i]) - rs.statVolume.mean)
+                * (static_cast<double>(rs.tick_volume[i]) - rs.statVolume.mean);
 
         if (i > 0) {
-            sumPriceDelta += ((rs.close[i] - rs.close[i - 1]) - rs.statPriceDelta.mean)
-                    * ((rs.close[i] - rs.close[i - 1]) - rs.statPriceDelta.mean);
-            sumVolumeDelta += (static_cast<double>(rs.tick_volume[i] - rs.tick_volume[i - 1]) - rs.statVolumeDelta.mean)
-                    * (static_cast<double>(rs.tick_volume[i] - rs.tick_volume[i - 1]) - rs.statVolumeDelta.mean);
+            priceDelta = rs.close[i] - rs.close[i - 1];
+            volumeDelta = static_cast<double>(static_cast<int>(rs.tick_volume[i])
+                                              - static_cast<int>(rs.tick_volume[i - 1]));
+
+
+            sumPriceDelta += (priceDelta - rs.statPriceDelta.mean)
+                    * (priceDelta - rs.statPriceDelta.mean);
+            sumVolumeDelta += (volumeDelta - rs.statVolumeDelta.mean)
+                    * (volumeDelta - rs.statVolumeDelta.mean);
         }
     }
 
     rs.statPrice.var   = sumPrice / static_cast<double>(rs.statPrice.count - 1);
     rs.statPrice.stdv  = sqrt(rs.statPrice.var);
-    rs.statVolume.var  = sumPrice / static_cast<double>(rs.statPrice.count - 1);
+    rs.statVolume.var  = sumVolume / static_cast<double>(rs.statPrice.count - 1);
     rs.statVolume.stdv = sqrt(rs.statVolume.var);
     rs.statPriceDelta.var = sumPriceDelta / static_cast<double>(rs.statPrice.count - 2);
     rs.statPriceDelta.stdv = sqrt(rs.statPriceDelta.var);
@@ -336,6 +347,18 @@ inline string &genSymbolKey(MARKETID market, string& symbol_name, ENUM_TIMEFRAME
     return key;
 }
 
+ostream& operator<< (ostream& out, TickVector vec) {
+    for (size_t i = 0; i < vec.size(); ++i) {
+        out << vec[i].time << ", "
+            << vec[i].last << ", "
+            << vec[i].bid[0] << ", "
+            << vec[i].ask[0] << ", "
+            << vec[i].last_volume << ", "
+            << vec[i].bid_volume[0] << ", "
+            << vec[i].ask_volume[0] << std::endl;
+    }
 
+    return out;
+}
 
 } //namespace MQL4

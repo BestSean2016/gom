@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <limits>
 #include <math.h>
+#include <iostream>
 
 namespace MQL4 {
 
@@ -83,6 +84,9 @@ void MathGaussianNoise3(T* v, double mu, double sigma, size_t n = 3) {
 
     v[0] = static_cast<T>((sqrt(-2.0 * log(u1)) * cos(two_pi * u2)) * sigma + mu);
     v[1] = static_cast<T>((sqrt(-2.0 * log(u1)) * sin(two_pi * u2)) * sigma + mu);
+
+    if (v[0] > 4000000)
+        std::cout << v[0] << ", " << v[1] << std::endl;
 
     do {
        u1 = rand() * (1.0 / RAND_MAX);

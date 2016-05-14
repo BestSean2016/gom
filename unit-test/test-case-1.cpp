@@ -393,8 +393,8 @@ TEST(Indicator, test_indicator) {
     EXPECT_LT(MQL4::gSelectedData->rs.statPrice.min - 107.665000000, 0.00000001);
 
     MQL4::TickVector ticks;
-
     result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, 500);
+    MQL4::TickVector2Csv(ticks, "ticks.csv");
 
     // printf("%.09f, %.09f, %.09f, %.09f, %.09f, %.09f\n",
     //        MacdCurrent, MacdPrevious, SignalCurrent, SignalPrevious, MaCurrent, MaPrevious);

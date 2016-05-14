@@ -209,6 +209,7 @@ extern MapRatesData mapRatesData;
 extern inline string &genSymbolKey(SYMBOL& symbol,string& key);
 extern inline string &genSymbolKey(MARKETID market, string& symbol_name, ENUM_TIMEFRAMES tf,string& key);
 
+extern ostream& operator<< (ostream& out, TickVector vec);
 
 } //namesapceMQL4
 
