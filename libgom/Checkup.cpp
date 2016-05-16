@@ -1,4 +1,7 @@
 #include "Checkup.h"
+#include "mql4-def.h"
+#include "mql4-data.h"
+#include "Tradeing.h"
 
 namespace MQL4 {
 
@@ -11,11 +14,23 @@ int  GetLastError() {
 }
 
 string  Symbol() {
-    return "";
+    if (!gSelectedData)
+        return "";
+    else
+        return gSelectedData->symbol.symbol_name;
 }
 
 double  Point() {
-    return (0);
+    double v = gSelectedData->data[1].close;
+    double iv, p = 1;
+
+    do {
+        v *= p;
+        iv = static_cast<double>(static_cast<ulong>(v));
+        p *= 10;
+    }while(fabs(v - iv) > 0.000001);
+
+    return p;
 }
 
 } //namespace MQL4

@@ -11,6 +11,7 @@
 
 // #include "ta-lib/ta_libc.h"
 #include "indicator.h"
+#include "Checkup.h"
 #include "Tradeing.h"
 
 using namespace std;
@@ -18,21 +19,24 @@ using namespace std;
 extern void OnInit();
 extern void OnDeinit();
 extern void OnTick();
-extern void OnCalculateSomething();
-extern void OnNewData();
+extern void OnNewData(MQL4::MqlTick& tick);
+
+extern double Point_;
 
 int main()
 {
     OnInit();
 
     int nBars = MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
-    MQL4::TickVector ticks;
 
-    int result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, 500);
+    MQL4::Point();
+
+    MQL4::TickVector ticks;
+    int result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, 10000);
     if (!result) {
         for (int i = 0; i < nBars; i++) {
             MQL4::setCurrentDataPos(i);
-            OnNewData();
+            OnNewData(ticks[i]);
             OnTick();
         }
     }

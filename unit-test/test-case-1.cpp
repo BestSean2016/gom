@@ -13,6 +13,7 @@
 
 #include "ta-lib/ta_libc.h"
 #include "indicator.h"
+#include "Checkup.h"
 #include "Tradeing.h"
 
 TEST(ForexStringToTime, Convertions) {
@@ -378,33 +379,33 @@ TEST(Indicator, test_indicator) {
     double MaCurrent=iMA(NULL, MQL4::PERIOD_M1,26 ,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,0);
     double MaPrevious=iMA(NULL,MQL4::PERIOD_M1,26 ,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,1);
 
-    EXPECT_LT(abs(MacdCurrent    - 0.000360627), 0.00000001);
-    EXPECT_LT(abs(MacdPrevious   - 0.00082818 ), 0.00000001);
-    EXPECT_LT(abs(SignalCurrent  - 0.000994764), 0.00000001);
-    EXPECT_LT(abs(SignalPrevious - 0.001153298), 0.00000001);
-    EXPECT_LT(abs(MaCurrent  - 109.448948062), 0.00000001);
-    EXPECT_LT(abs(MaPrevious - 109.449263907), 0.00000001);
+    EXPECT_LT(abs(MacdCurrent    - (0.000360627  )), 0.00000001);
+    EXPECT_LT(abs(MacdPrevious   - (0.00082818   )), 0.00000001);
+    EXPECT_LT(abs(SignalCurrent  - (0.000994764  )), 0.00000001);
+    EXPECT_LT(abs(SignalPrevious - (0.001153298  )), 0.00000001);
+    EXPECT_LT(abs(MaCurrent      - (109.448948062)), 0.00000001);
+    EXPECT_LT(abs(MaPrevious     - (109.449263907)), 0.00000001);
 
     EXPECT_EQ(MQL4::gSelectedData->rs.statPrice.count, static_cast<size_t>(13455));
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPrice.mean - 108.913630546), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPrice.stdv - 0.563896570  ), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPrice.var - 0.317979342   ), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPrice.max - 109.886000000 ), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPrice.min - 107.665000000 ), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPrice.mean - (108.913630546)), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPrice.stdv - (0.563896570  )), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPrice.var  - (0.317979342  )), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPrice.max  - (109.886000000)), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPrice.min  - (107.665000000)), 0.00000001);
 
     EXPECT_EQ(MQL4::gSelectedData->rs.statVolume.count, static_cast<size_t>(13455));
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolume.mean - 35.5331103679), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolume.stdv - 20.9486637760), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolume.var - 438.8465139982), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolume.max - 158.0000000000), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolume.min - 1.0000000000  ), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolume.mean - (35.5331103679 )), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolume.stdv - (20.9486637760 )), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolume.var  - (438.8465139982)), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolume.max  - (158.0000000000)), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolume.min  - (1.0000000000  )), 0.00000001);
 
 
     EXPECT_EQ(MQL4::gSelectedData->rs.statPriceDelta.count, static_cast<size_t>(13455));
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPriceDelta.mean - 0.0000661513 ), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPriceDelta.stdv - 0.0171723960 ), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPriceDelta.var  - 0.0002948912 ), 0.00000001);
-    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPriceDelta.max  - 0.1120000000 ), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPriceDelta.mean - (0.0000661513)), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPriceDelta.stdv - (0.0171723960)), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPriceDelta.var  - (0.0002948912)), 0.00000001);
+    EXPECT_LT(abs(MQL4::gSelectedData->rs.statPriceDelta.max  - (0.1120000000)), 0.00000001);
     EXPECT_LT(abs(MQL4::gSelectedData->rs.statPriceDelta.min  - (-0.4760000000)), 0.00000001);
 
     EXPECT_EQ(MQL4::gSelectedData->rs.statVolumeDelta.count, static_cast<size_t>(13455));
@@ -429,6 +430,10 @@ TEST(Indicator, test_indicator) {
     EXPECT_EQ(ptr, (char*)NULL);
 
     pclose(fstream);
+
+
+    double  p = MQL4::Point();
+    EXPECT_EQ(p, 1000);
 
     MQL4::mapRatesData.releaseRatesFromMap();
 }
