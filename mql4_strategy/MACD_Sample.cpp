@@ -45,6 +45,7 @@ void OnDeinit(void) {
 }
 
 void OnNewData(MqlTick &tick) {
+    gSelectedData->addNewTick(tick);
     Bars_ = static_cast<int>(MQL4::gSelectedData->data.size());
     Bid_ = tick.bid[0];
     Ask_ = tick.ask[0];
@@ -108,15 +109,12 @@ void OnTick(void) {
         }
       //--- check for short position (SELL) possibility
       if(MacdCurrent>0 && MacdCurrent<SignalCurrent && MacdPrevious>SignalPrevious && 
-         MacdCurrent>(MACDOpenLevel*Point_) && MaCurrent<MaPrevious)
-        {
-         ticket=OrderSend(Symbol(),OP_SELL,Lots,Bid_,3,0,Bid_-TakeProfit*Point_,"macd sample",16384,0,Red);
-         if(ticket>0)
-           {
+         MacdCurrent>(MACDOpenLevel*Point_) && MaCurrent<MaPrevious) {
+         ticket = OrderSend(Symbol(), OP_SELL, Lots, Bid_, 3, 0, Bid_ - TakeProfit * Point_, "macd sample", 16384, 0, Red);
+         if(ticket>0) {
             if(OrderSelect(ticket,SELECT_BY_TICKET,MODE_TRADES))
-               Print("SELL order opened : ",OrderOpenPrice());
-           }
-         else
+                Print("SELL order opened : ",OrderOpenPrice());
+         }          else
             Print("Error opening SELL order : ",GetLastError());
         }
       //--- exit from the "no opened orders" block

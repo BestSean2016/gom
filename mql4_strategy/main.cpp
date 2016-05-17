@@ -29,7 +29,7 @@ int main()
 
     int nBars = MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
 
-    MQL4::Point();
+    Point_ = MQL4::Point();
 
     MQL4::TickVector ticks;
     int result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, 10000);

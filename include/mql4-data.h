@@ -151,6 +151,12 @@ public:
     /* convert to tick */
     int reates_to_tick(TickData& td);
 
+    /**
+     * @brief addNewTick add new tick data to ratedata
+     * @param tick the new tick data
+     */
+    void addNewTick(MqlTick& tick);
+
 private:
     /**
      * @brief get_forex_furtures_ get forex future data

@@ -256,6 +256,12 @@ void RatesData::releaseData() {
 
 
 
+void RatesData::addNewTick(MqlTick& tick) {
+
+}
+
+
+
 //
 // class map <--> rates data
 //
