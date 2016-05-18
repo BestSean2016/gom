@@ -255,9 +255,31 @@ void RatesData::releaseData() {
 }
 
 
+bool RatesData::is_new_rates_(ENUM_TIMEFRAMES period, datetime rates_time, datetime tick_time) {
+    return (tick_time - rates_time >= period * 60);
+}
+
+void RatesData::addRateData_(MqlTick& tick) {
+    MqlRates rates;
+    rates.close = rates.high = rates.low = rates.open = tick.last;
+    rates.tick_volume = tick.last_volume;
+    rates.time = tick.time;
+    addRateData(rates);
+}
+
+void RatesData::update_rate_(MqlRates& rates, MqlTick& tick) {
+    rates.high  = max(rates.high, tick.last);
+    rates.low   = min(rates.low , tick.last);
+    rates.close = tick.last;
+    rates.tick_volume += tick.last_volume;
+}
 
 void RatesData::addNewTick(MqlTick& tick) {
-
+     MqlRates &rates = data[data.size() - 1];
+     if (is_new_rates_(symbol.period, rates.time, tick.time))
+         addRateData_(tick);
+     else
+         update_rate_(rates, tick);
 }
 
 

@@ -184,6 +184,10 @@ private:
      */
     int get_forex_rates_data__(MqlRates& rate, const string& str);
 
+
+    bool is_new_rates_(ENUM_TIMEFRAMES period, datetime rates_time, datetime tick_time);
+    void addRateData_(MqlTick& tick);
+    void update_rate_(MqlRates& rates, MqlTick& tick);
 };
 
 typedef std::map<string, RatesData*> MAP_RATES_DATA;
