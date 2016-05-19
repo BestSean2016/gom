@@ -23,16 +23,16 @@ string  Symbol() {
 
 double  Point() {
     double v = gSelectedData->data[1].close;
-    double iv, p = 1;
+    double iv, p = 1, pnt = 1;
 
     do {
         v *= p;
         iv = static_cast<double>(static_cast<ulong>(v));
         p *= 10;
+        pnt /= 10;
     }while(fabs(v - iv) > 0.000001);
 
-    Point_ = p;
-    return p;
+    return pnt;
 }
 
 } //namespace MQL4

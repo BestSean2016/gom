@@ -324,7 +324,7 @@ TEST (ORDER, test_order) {
     EXPECT_EQ(order->deviation, (unsigned long)1);
     EXPECT_EQ(order->status, MQL4::ENUM_ORDER_STATUS_OPENED);
 
-    bool t = MQL4::OrderSelect(1, MQL4::SELECT_BY_POS);
+    bool t = MQL4::OrderSelect(0, MQL4::SELECT_BY_POS);
     EXPECT_EQ(t, true);
     EXPECT_EQ(order, MQL4::gSelectedOrder);
 
@@ -352,7 +352,7 @@ TEST (ORDER, test_order) {
     EXPECT_EQ(order->status, MQL4::ENUM_ORDER_STATUS_CLOSED);
 
     EXPECT_EQ(MQL4::gOrders.size(), (unsigned long)2);
-    t = MQL4::OrderSelect(2, MQL4::SELECT_BY_POS);
+    t = MQL4::OrderSelect(1, MQL4::SELECT_BY_POS);
     EXPECT_EQ(t, true);
     EXPECT_NE(order, MQL4::gSelectedOrder);
 
@@ -379,10 +379,10 @@ TEST(Indicator, test_indicator) {
     double MaCurrent=iMA(NULL, MQL4::PERIOD_M1,26 ,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,0);
     double MaPrevious=iMA(NULL,MQL4::PERIOD_M1,26 ,0,MQL4::MODE_EMA,MQL4::PRICE_CLOSE,1);
 
-    EXPECT_LT(abs(MacdCurrent    - (0.000360627  )), 0.00000001);
-    EXPECT_LT(abs(MacdPrevious   - (0.00082818   )), 0.00000001);
-    EXPECT_LT(abs(SignalCurrent  - (0.000994764  )), 0.00000001);
-    EXPECT_LT(abs(SignalPrevious - (0.001153298  )), 0.00000001);
+    EXPECT_LT(abs(MacdCurrent    - (0.000828180  )), 0.00000001);
+    EXPECT_LT(abs(MacdPrevious   - (0.000801993  )), 0.00000001);
+    EXPECT_LT(abs(SignalCurrent  - (0.001153298  )), 0.00000001);
+    EXPECT_LT(abs(SignalPrevious - (0.001234578  )), 0.00000001);
     EXPECT_LT(abs(MaCurrent      - (109.448948062)), 0.00000001);
     EXPECT_LT(abs(MaPrevious     - (109.449263907)), 0.00000001);
 
@@ -438,9 +438,9 @@ TEST(Indicator, test_indicator) {
     //}
 
     double  p = MQL4::Point();
-    EXPECT_EQ(p, 1000);
+    EXPECT_EQ(p, 0.001);
 
-    int NEW_TICK_NUMBER = 10000;
+    int NEW_TICK_NUMBER = 100000;
     for (int i = 0; i < NEW_TICK_NUMBER; i++) {
         MQL4::setCurrentDataPos(i);
         MQL4::OnNewData(ticks[i]);
@@ -448,18 +448,18 @@ TEST(Indicator, test_indicator) {
 
     MQL4::releaseTickVector(ticks);
 
-    //{
-    //    MQL4::gSelectedData->ratesToCSV("rates.csv");
-    //
-    //    fstream = popen("diff rates.csv /home/sean/projects/quants/gom/unit-test/rates-banchmark.csv","r");
-    //    EXPECT_NE(fstream, (FILE*)NULL);
-    //
-    //    memset(buff,0,sizeof(buff));
-    //    char* ptr = fgets(buff, sizeof(buff), fstream);
-    //    EXPECT_EQ(ptr, (char*)NULL);
-    //
-    //    pclose(fstream);
-    //}
+    {
+        MQL4::gSelectedData->ratesToCSV("rates.csv");
+
+        //fstream = popen("diff rates.csv /home/sean/projects/quants/gom/unit-test/rates-banchmark.csv","r");
+        //EXPECT_NE(fstream, (FILE*)NULL);
+        //
+        //memset(buff,0,sizeof(buff));
+        //char* ptr = fgets(buff, sizeof(buff), fstream);
+        //EXPECT_EQ(ptr, (char*)NULL);
+        //
+        //pclose(fstream);
+    }
 
     {
         MQL4::BASIC_STATISTICS stat;

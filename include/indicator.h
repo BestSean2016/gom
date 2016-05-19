@@ -88,6 +88,7 @@ extern double Bid_  ;
 extern double Ask_  ;
 extern double Point_;
 
+extern int gCurrentDataPos;
 
 } //namespace MQL4
 

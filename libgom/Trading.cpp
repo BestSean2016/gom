@@ -11,7 +11,7 @@ MqlTradeRequest* gSelectedOrder = 0;
 string           gSelectedSymbol = "USDJPY";
 RatesData*       gSelectedData = 0;
 
-static unsigned int gticket = 100000;
+static unsigned int gticket = 10000;
 
 
 bool selectSymbol(const char* symbol, ENUM_TIMEFRAMES timeframe) {
@@ -37,9 +37,9 @@ bool  OrderSelect(
     (void)pool;
 
     if (select == SELECT_BY_POS) {
-        if (index < 1 || index > static_cast<int>(gOrders.size()))
+        if (index < 0 || index >= static_cast<int>(gOrders.size()))
             return false;
-        gSelectedOrder = gOrders[index - 1];
+        gSelectedOrder = gOrders[index];
     } else if (select == SELECT_BY_TICKET) {
         gSelectedOrder = findInOrderMap(gmapOrders, index);
         return (gSelectedOrder != 0);

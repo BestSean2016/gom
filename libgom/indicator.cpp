@@ -5,7 +5,7 @@
 
 
 namespace MQL4 {
-static int gCurrentDataPos = 0;
+int gCurrentDataPos = 0;
 
 void setCurrentDataPos(int pos) {gCurrentDataPos = pos;}
 
@@ -138,14 +138,18 @@ double  iMACD(
             outMACDSignal,
             outMACDHist );
 
+    //for (int i = 0; i < outNBElement; ++i) {
+    //    cout << i << ", " << outMACD[i] << ", " << outMACDSignal[i] << ", " << outMACDHist[i] << endl;
+    //}
+
     //
     // to do check the shift must less than amount
     //
 
     double retval = (mode == MODE_MAIN) ?
-                outMACD[outNBElement - 1 - shift]
+                outMACD[outNBElement - 2 - shift]
                 :
-                outMACDSignal[outNBElement - 1 - shift];
+                outMACDSignal[outNBElement - 2 - shift];
 
     delete [] outMACD;
     return retval;

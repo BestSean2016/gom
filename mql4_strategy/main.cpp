@@ -22,22 +22,22 @@ extern void OnDeinit();
 extern void OnTick();
 \
 
-#define NEW_TICK_NUMBER 10000
+#define NEW_TICK_NUMBER 100000
 
 int main()
 {
     OnInit();
 
-    int nBars = MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
-
+    MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
     MQL4::Point_ = MQL4::Point();
 
     MQL4::TickVector ticks;
+    srand(12345);
     int result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, NEW_TICK_NUMBER);
     if (!result) {
-        for (int i = 0; i < nBars; i++) {
-            MQL4::setCurrentDataPos(i);
+        for (int i = 0; i < NEW_TICK_NUMBER; i++) {
             OnNewData(ticks[i]);
+            MQL4::setCurrentDataPos(MQL4::iBars("USDJPY", MQL4::PERIOD_M1));
             OnTick();
         }
     }
