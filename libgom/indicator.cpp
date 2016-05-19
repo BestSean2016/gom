@@ -152,7 +152,21 @@ double  iMACD(
 }
 
 
-double Bid() { return 0; }
-double Ask() { return 0; }
+double Bid() { return Bid_; }
+double Ask() { return Ask_; }
+
+
+int    Bars_  = 0;
+double Bid_   = 0;
+double Ask_   = 0;
+double Point_ = 0;
+
+void OnNewData(MqlTick &tick) {
+    gSelectedData->addNewTick(tick);
+    Bars_ = static_cast<int>(MQL4::gSelectedData->data.size());
+    Bid_ = tick.bid[0];
+    Ask_ = tick.ask[0];
+}
+
 
 } //namespace MQL4

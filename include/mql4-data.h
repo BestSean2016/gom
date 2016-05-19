@@ -157,6 +157,12 @@ public:
      */
     void addNewTick(MqlTick& tick);
 
+    /**
+     * @brief ratesToCSV save rates data to the csv
+     * @param csvpath the new filepath
+     */
+    void ratesToCSV(const char* csvpath);
+
 private:
     /**
      * @brief get_forex_furtures_ get forex future data

@@ -415,25 +415,78 @@ TEST(Indicator, test_indicator) {
     EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolumeDelta.max  - (86.0000000000 )), 0.00000001);
     EXPECT_LT(abs(MQL4::gSelectedData->rs.statVolumeDelta.min  - (-76.0000000000)), 0.00000001);
 
+    MQL4::BASIC_STATISTICS statPriceOld  = MQL4::gSelectedData->rs.statPrice;
+    MQL4::BASIC_STATISTICS statVolumeOld = MQL4::gSelectedData->rs.statVolume;
+
     MQL4::TickVector ticks;
     srand(12345);
     result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, 10000);
     MQL4::TickVector2Csv(ticks, "ticks.csv");
 
-    FILE *fstream = NULL;
-    char buff[1024];
-    memset(buff,0,sizeof(buff));
-    fstream = popen("diff ticks.csv /home/sean/projects/quants/gom/unit-test/ticks-banchmark.csv","r");
-    EXPECT_NE(fstream, (FILE*)NULL);
-
-    char* ptr = fgets(buff, sizeof(buff), fstream);
-    EXPECT_EQ(ptr, (char*)NULL);
-
-    pclose(fstream);
-
+    //FILE *fstream = NULL;
+    //char buff[1024];
+    //
+    //{
+    //    fstream = popen("diff ticks.csv /home/sean/projects/quants/gom/unit-test/ticks-banchmark.csv","r");
+    //    EXPECT_NE(fstream, (FILE*)NULL);
+    //
+    //    memset(buff,0,sizeof(buff));
+    //    char* ptr = fgets(buff, sizeof(buff), fstream);
+    //    EXPECT_EQ(ptr, (char*)NULL);
+    //
+    //    pclose(fstream);
+    //}
 
     double  p = MQL4::Point();
     EXPECT_EQ(p, 1000);
 
+    int NEW_TICK_NUMBER = 10000;
+    for (int i = 0; i < NEW_TICK_NUMBER; i++) {
+        MQL4::setCurrentDataPos(i);
+        MQL4::OnNewData(ticks[i]);
+    }
+
+    MQL4::releaseTickVector(ticks);
+
+    //{
+    //    MQL4::gSelectedData->ratesToCSV("rates.csv");
+    //
+    //    fstream = popen("diff rates.csv /home/sean/projects/quants/gom/unit-test/rates-banchmark.csv","r");
+    //    EXPECT_NE(fstream, (FILE*)NULL);
+    //
+    //    memset(buff,0,sizeof(buff));
+    //    char* ptr = fgets(buff, sizeof(buff), fstream);
+    //    EXPECT_EQ(ptr, (char*)NULL);
+    //
+    //    pclose(fstream);
+    //}
+
+    {
+        MQL4::BASIC_STATISTICS stat;
+        MQL4::MathBasicStatistics(MQL4::gSelectedData->rs.close, MQL4::gSelectedData->rs.amount, stat);
+        EXPECT_LT(fabs(stat.mean - statPriceOld.mean) / stat.mean, 0.02);
+        EXPECT_LT(fabs(stat.stdv - statPriceOld.stdv) / stat.stdv, 0.02);
+        EXPECT_LT(fabs(stat.var  - statPriceOld.var ) / stat.var , 0.02);
+
+        MQL4::MathBasicStatistics(MQL4::gSelectedData->rs.high, MQL4::gSelectedData->rs.amount, stat);
+        EXPECT_LT(fabs(stat.mean - statPriceOld.mean) / stat.mean, 0.02);
+        EXPECT_LT(fabs(stat.stdv - statPriceOld.stdv) / stat.stdv, 0.02);
+        EXPECT_LT(fabs(stat.var  - statPriceOld.var ) / stat.var , 0.02);
+
+        MQL4::MathBasicStatistics(MQL4::gSelectedData->rs.low, MQL4::gSelectedData->rs.amount, stat);
+        EXPECT_LT(fabs(stat.mean - statPriceOld.mean) / stat.mean, 0.02);
+        EXPECT_LT(fabs(stat.stdv - statPriceOld.stdv) / stat.stdv, 0.02);
+        EXPECT_LT(fabs(stat.var  - statPriceOld.var ) / stat.var , 0.02);
+
+        MQL4::MathBasicStatistics(MQL4::gSelectedData->rs.open, MQL4::gSelectedData->rs.amount, stat);
+        EXPECT_LT(fabs(stat.mean - statPriceOld.mean) / stat.mean, 0.02);
+        EXPECT_LT(fabs(stat.stdv - statPriceOld.stdv) / stat.stdv, 0.02);
+        EXPECT_LT(fabs(stat.var  - statPriceOld.var ) / stat.var , 0.02);
+
+        MQL4::MathBasicStatistics(MQL4::gSelectedData->rs.tick_volume, MQL4::gSelectedData->rs.amount, stat);
+        EXPECT_LT(fabs(stat.mean - statVolumeOld.mean) / stat.mean, 0.02);
+        EXPECT_LT(fabs(stat.stdv - statVolumeOld.stdv) / stat.stdv, 0.02);
+        EXPECT_LT(fabs(stat.var  - statVolumeOld.var ) / stat.var , 0.02);
+    }
     MQL4::mapRatesData.releaseRatesFromMap();
 }

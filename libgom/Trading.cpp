@@ -104,8 +104,8 @@ int forex_simulator_new_data(TickVector& ticks, const RatesData* rd, int len) {
         tick.bid_volume[0] = (value[4] < 0) ? 1 : value[4];// + ticks[i - 1].bid_volume[0];
         tick.last_volume   = (value[5] < 0) ? 1 : value[5];// + ticks[i - 1].last_volume;
 
-        tick.time = ltime;
         ltime += 1;
+        tick.time = ltime;
         ticks.push_back(tick);
     }
 

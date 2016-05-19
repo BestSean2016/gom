@@ -271,7 +271,7 @@ void RatesData::update_rate_(MqlRates& rates, MqlTick& tick) {
     rates.high  = max(rates.high, tick.last);
     rates.low   = min(rates.low , tick.last);
     rates.close = tick.last;
-    rates.tick_volume += tick.last_volume;
+    rates.tick_volume = tick.last_volume;
 }
 
 void RatesData::addNewTick(MqlTick& tick) {
@@ -280,6 +280,14 @@ void RatesData::addNewTick(MqlTick& tick) {
          addRateData_(tick);
      else
          update_rate_(rates, tick);
+}
+
+void RatesData::ratesToCSV(const char* csvpath) {
+    ofstream out(csvpath);
+    for(auto& p : data )
+        out << p.time << ", " << p.open << ", " << p.high << ", "
+            << p.low << ", " << p.close << ", " << p.tick_volume << endl;
+    out.close();
 }
 
 

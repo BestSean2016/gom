@@ -25,11 +25,6 @@ static double MACDOpenLevel  = 3;
 static double MACDCloseLevel = 2;
 static int    MATrendPeriod  = 26;
 
-static int    Bars_  = 0;
-static double Bid_   = 0;
-static double Ask_   = 0;
-
-double Point_ = 0;
 
 using namespace MQL4;
 

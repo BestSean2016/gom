@@ -15,13 +15,14 @@
 #include "Tradeing.h"
 
 using namespace std;
+using namespace MQL4;
 
 extern void OnInit();
 extern void OnDeinit();
 extern void OnTick();
-extern void OnNewData(MQL4::MqlTick& tick);
+\
 
-extern double Point_;
+#define NEW_TICK_NUMBER 10000
 
 int main()
 {
@@ -29,10 +30,10 @@ int main()
 
     int nBars = MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
 
-    Point_ = MQL4::Point();
+    MQL4::Point_ = MQL4::Point();
 
     MQL4::TickVector ticks;
-    int result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, 10000);
+    int result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, NEW_TICK_NUMBER);
     if (!result) {
         for (int i = 0; i < nBars; i++) {
             MQL4::setCurrentDataPos(i);

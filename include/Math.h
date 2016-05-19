@@ -66,7 +66,34 @@ typedef struct BASIC_STATISTICS {
     double max;
 }BASIC_STATISTICS;
 
-extern bool   MathBasicStatistics(const double* value, const uint count, BASIC_STATISTICS& statistics);
+template<class T>
+bool   MathBasicStatistics(const T* value, const uint count, BASIC_STATISTICS& statistics) {
+    if (!value || !count) return false;
+    struct numeric_limits<double> nl;
+    statistics.min = nl.max();
+    statistics.max = nl.min();
+    statistics.count = count;
+
+    double sum = 0;
+    for (uint i = 0; i < count; ++i) {
+        sum += static_cast<double>(value[i]);
+        statistics.min = min(statistics.min, static_cast<double>(value[i]));
+        statistics.max = max(statistics.max, static_cast<double>(value[i]));
+    }
+
+    statistics.mean = sum / static_cast<double>(count);
+
+    sum = 0;
+    for (uint i = 0; i < count; ++i)
+        sum += (static_cast<double>(value[i]) - statistics.mean)
+             * (static_cast<double>(value[i]) - statistics.mean);
+
+    statistics.var  = sum / static_cast<double>(count - 1);
+    statistics.stdv = sqrt(statistics.var);
+
+    return true;
+}
+
 
 extern void   MathGaussianNoise(double mu, double sigma, double* array, size_t n);
 extern void   MathGaussianNoise2(double mu, double sigma, double* v1, double* v2);

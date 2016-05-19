@@ -1,6 +1,7 @@
 #include "Checkup.h"
 #include "mql4-def.h"
 #include "mql4-data.h"
+#include "indicator.h"
 #include "Tradeing.h"
 
 namespace MQL4 {
@@ -30,6 +31,7 @@ double  Point() {
         p *= 10;
     }while(fabs(v - iv) > 0.000001);
 
+    Point_ = p;
     return p;
 }
 

@@ -78,9 +78,15 @@ extern double  iMACD(const char *symbol,           // symbol
                      );
 
 extern void setCurrentDataPos(int pos);
+extern void OnNewData(MqlTick& tick);
 
 extern double Bid();
 extern double Ask();
+
+extern int    Bars_ ;
+extern double Bid_  ;
+extern double Ask_  ;
+extern double Point_;
 
 
 } //namespace MQL4
