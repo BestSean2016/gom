@@ -64,6 +64,31 @@ string  OrderSymbol() {
     return gSelectedOrder->symbol;
 }
 
+double OrderProfit() {
+    if (!gSelectedOrder) return 0;
+    return gSelectedOrder->tp;
+}
+
+
+
+ulong OrderMagicNumber() {
+    if (!gSelectedOrder) return 0;
+    return gSelectedOrder->magic;
+}
+
+int HistoryTotal() {
+    return OrdersHistoryTotal();
+}
+
+int OrdersHistoryTotal() {
+    int closed = 0;
+    for (auto& p : gOrders)
+        if (p->status == ENUM_ORDER_STATUS_CLOSED)
+            ++closed;
+
+    return closed;
+}
+
 int  OrderTicket() {
     if (!gSelectedOrder) return -1;
     return gSelectedOrder->order;

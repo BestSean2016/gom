@@ -18,7 +18,8 @@ SOURCES += main.cpp \
     ../libgom/stdlib-mql4.cpp \
     ../libgom/string-ops.cpp \
     ../libgom/Trading.cpp \
-    ../libgom/mql4-data.cpp
+    ../libgom/mql4-data.cpp \
+    moving_average.cpp
 
 HEADERS += \
     ../include/datetime.h \
