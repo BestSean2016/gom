@@ -83,23 +83,6 @@ extern void OnNewData(MqlTick& tick);
 extern double Bid();
 extern double Ask();
 
-extern int       _Digits      ; ///Number of digits after decimal point for the current symbol prices
-extern double    _Point       ; ///Size of the current symbol point in the quote currency
-extern int       _LastError   ; ///The last error code
-extern int       _Period      ; ///Timeframe of the current chart
-extern int       _RandomSeed  ; ///Current status of the generator of pseudo-random integers
-extern bool      _StopFlag    ; ///Program stop flag
-extern string    _Symbol      ; ///Symbol name of the current chart
-extern int       _UninitReason; ///Uninitialization reason code
-extern double    _Ask         ; ///The latest known seller's price (ask price) of the current symbol
-extern int       _Bars        ; ///Number of bars in the current chart
-extern double    _Bid         ; ///The latest known buyer's price (offer price, bid price) of the current symbol
-extern double *  _Close       ; ///Series array that contains close prices for each bar of the current chart
-extern double *  _High        ; ///Series array that contains the highest prices of each bar of the current chart
-extern double *  _Low         ; ///Series array that contains the lowest prices of each bar of the current chart
-extern double *  _Open        ; ///Series array that contains open prices of each bar of the current chart
-extern datetime* _Time        ; ///Series array that contains open time of each bar of the current chart
-extern double *  _Volume      ; ///Series array that contains tick volumes of each bar of the current chart
 
 extern int gCurrentDataPos;
 

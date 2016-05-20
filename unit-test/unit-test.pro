@@ -16,7 +16,9 @@ SOURCES += \
     ../libgom/datetime.cpp \
     ../libgom/Trading.cpp \
     ../libgom/Math.cpp \
-    ../libgom/Checkup.cpp
+    ../libgom/Checkup.cpp \
+    ../libgom/strategy.cpp \
+    ../libgom/order.cpp
 
 HEADERS += \
     /home/sean/projects/googletest/googletest/include/gtest/gtest.h \
@@ -32,4 +34,6 @@ HEADERS += \
     ../include/mql4-def.h \
     ../include/stderror-mql4.h \
     ../include/stdlib-mql4.h \
-    ../include/string-ops.h
+    ../include/string-ops.h \
+    ../include/strategy.h \
+    ../include/order.h

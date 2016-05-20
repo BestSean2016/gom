@@ -15,6 +15,7 @@
 #include "indicator.h"
 #include "Checkup.h"
 #include "Tradeing.h"
+#include "strategy.h"
 
 TEST(ForexStringToTime, Convertions) {
     MQL4::datetime t1 = MQL4::ForexStringToTime("2016.04.08,16:22,108.600,108.601,108.551,108.555,86");
@@ -312,7 +313,7 @@ TEST (ORDER, test_order) {
                       9.0,
                       18.0);
 
-    EXPECT_EQ(MQL4::gOrders.size(), (size_t)1);
+    EXPECT_EQ(gOrders.size(), (size_t)1);
     MQL4::MqlTradeRequest* order = MQL4::findInOrderMap(MQL4::gmapOrders, ticket);
 
     EXPECT_EQ(order->type, MQL4::ORDER_BUY);

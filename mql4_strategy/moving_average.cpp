@@ -82,20 +82,22 @@ double LotsOptimized() {
 //+------------------------------------------------------------------+
 void CheckForOpen() {
   double ma;
-  int res;
+  //int res;
   //--- go trading only for first tiks of new bar
   if (_Volume[0] > 1) return;
   //--- get Moving Average
   ma = iMA(NULL, 0, MovingPeriod, MovingShift, MODE_SMA, PRICE_CLOSE, 0);
   //--- sell conditions
   if (_Open[1] > ma && _Close[1] < ma) {
-    res = OrderSend(Symbol(), OP_SELL, LotsOptimized(), _Bid, 3, 0, 0, "",
+    //res =
+      OrderSend(Symbol(), OP_SELL, LotsOptimized(), _Bid, 3, 0, 0, "",
                     MAGICMA, 0, Red);
     return;
   }
   //--- buy conditions
   if (_Open[1] < ma && _Close[1] > ma) {
-    res = OrderSend(Symbol(), OP_BUY, LotsOptimized(), _Ask, 3, 0, 0, "",
+    //res =
+      OrderSend(Symbol(), OP_BUY, LotsOptimized(), _Ask, 3, 0, 0, "",
                     MAGICMA, 0, Blue);
     return;
   }
