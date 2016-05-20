@@ -43,13 +43,13 @@ int  iBars(
 
 
 double  iMA(
-   const char *    symbol,           // symbol
-   ENUM_TIMEFRAMES timeframe,        // timeframe
-   int             ma_period,        // MA averaging period
-   int             ma_shift,         // MA shift
-   int             ma_method,        // averaging method
-   int             applied_price,    // applied price
-   int             shift             // shift
+   const char *symbol,           // symbol
+   int         timeframe,        // timeframe
+   int         ma_period,        // MA averaging period
+   int         ma_shift,         // MA shift
+   int         ma_method,        // averaging method
+   int         applied_price,    // applied price
+   int         shift             // shift
    ) {
     MQL4::RatesData* rd = MQL4::gSelectedData;
     if (symbol != 0) {
@@ -156,20 +156,34 @@ double  iMACD(
 }
 
 
-double Bid() { return Bid_; }
-double Ask() { return Ask_; }
+double Bid() { return _Bid; }
+double Ask() { return _Ask; }
 
 
-int    Bars_  = 0;
-double Bid_   = 0;
-double Ask_   = 0;
-double Point_ = 0;
+int       _Digits       = 0; ///Number of digits after decimal point for the current symbol prices
+double    _Point        = 0; ///Size of the current symbol point in the quote currency
+int       _LastError    = 0; ///The last error code
+int       _Period       = 0; ///Timeframe of the current chart
+int       _RandomSeed   = 0; ///Current status of the generator of pseudo-random integers
+bool      _StopFlag     = 0; ///Program stop flag
+string    _Symbol       = 0; ///Symbol name of the current chart
+int       _UninitReason = 0; ///Uninitialization reason code
+double    _Ask          = 0; ///The latest known seller's price (ask price) of the current symbol
+int       _Bars         = 0; ///Number of bars in the current chart
+double    _Bid          = 0; ///The latest known buyer's price (offer price, bid price) of the current symbol
+double *  _Close        = 0; ///Series array that contains close prices for each bar of the current chart
+double *  _High         = 0; ///Series array that contains the highest prices of each bar of the current chart
+double *  _Low          = 0; ///Series array that contains the lowest prices of each bar of the current chart
+double *  _Open         = 0; ///Series array that contains open prices of each bar of the current chart
+datetime* _Time         = 0; ///Series array that contains open time of each bar of the current chart
+double *  _Volume       = 0; ///Series array that contains tick volumes of each bar of the current chart
+
 
 void OnNewData(MqlTick &tick) {
     gSelectedData->addNewTick(tick);
-    Bars_ = static_cast<int>(MQL4::gSelectedData->data.size());
-    Bid_ = tick.bid[0];
-    Ask_ = tick.ask[0];
+    _Bars = static_cast<int>(MQL4::gSelectedData->data.size());
+    _Bid = tick.bid[0];
+    _Ask = tick.ask[0];
 }
 
 

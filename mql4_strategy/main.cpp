@@ -29,7 +29,7 @@ int main()
     OnInit();
 
     MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
-    MQL4::Point_ = MQL4::Point();
+    MQL4::_Point = MQL4::Point();
 
     MQL4::TickVector ticks;
     srand(12345);

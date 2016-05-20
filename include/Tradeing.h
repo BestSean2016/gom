@@ -460,6 +460,13 @@ extern int  OrdersHistoryTotal();
 extern int  HistoryTotal();
 
 
+/**
+ * @brief OrderProfit returns profit of the currently selected order
+ * @return profit of the currently selected order
+ */
+extern double OrderProfit();
+
+
 extern MqlTradeRequest* findInOrderMap(MapIntToOrders& mapOrders, int ticket);
 extern bool selectSymbol(const char* symbol,
                          ENUM_TIMEFRAMES timeframe = PERIOD_M1);
