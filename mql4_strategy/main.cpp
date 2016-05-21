@@ -28,16 +28,16 @@ int main()
 {
     OnInit();
 
-    MQL4::iBars("USDJPY", MQL4::PERIOD_M1);
-    MQL4::_Point = MQL4::Point();
+    Indicator indicator;
+    indicator.iBars("USDJPY", MQL4::PERIOD_M1);
 
     MQL4::TickVector ticks;
     srand(12345);
-    int result = MQL4::forex_simulator_new_data(ticks, MQL4::gSelectedData, NEW_TICK_NUMBER);
+    int result = MQL4::forex_simulator_new_data(ticks, indicator._SelectedData, NEW_TICK_NUMBER, MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
     if (!result) {
         for (int i = 0; i < NEW_TICK_NUMBER; i++) {
-            OnNewData(ticks[i]);
-            MQL4::setCurrentDataPos(MQL4::iBars("USDJPY", MQL4::PERIOD_M1));
+            indicator.OnNewData(ticks[i]);
+            indicator.setCurrentDataPos(indicator.iBars("USDJPY", MQL4::PERIOD_M1));
             OnTick();
         }
     }

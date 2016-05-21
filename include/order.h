@@ -445,7 +445,7 @@ public:
    */
   double OrderProfit();
 
-  MqlTradeRequest *findInOrderMap(MapIntToOrders &mapOrders, int ticket);
+  MqlTradeRequest *findInOrderMap(int ticket);
 };
 
 } // namespace MQL4

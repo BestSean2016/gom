@@ -39,9 +39,10 @@ extern bool selectSymbol(const char* symbol,
                          ENUM_TIMEFRAMES timeframe = PERIOD_M1);
 
 extern int forex_simulator_new_data(TickVector& ticks, const RatesData* rd,
-                                    int len);
+                                    int len, int time_frames);
 extern void releaseTickVector(TickVector& ticks);
 extern void TickVector2Csv(TickVector& ticks, const char* filepath);
+
 
 }  // namespace MQL4
 

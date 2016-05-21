@@ -21,7 +21,7 @@ bool  Order::OrderSelect(
             return false;
         _SelectedOrder = _Orders[index];
     } else if (select == SELECT_BY_TICKET) {
-        _SelectedOrder = findInOrderMap(_mapOrders, index);
+        _SelectedOrder = findInOrderMap(index);
         return (_SelectedOrder != 0);
     } else
         return false;
@@ -93,7 +93,7 @@ bool  Order::OrderModify(
    datetime   expiration,  // expiration
    color      arrow_color  // color
 ) {
-    MqlTradeRequest* mtr = findInOrderMap(_mapOrders, ticket);
+    MqlTradeRequest* mtr = findInOrderMap(ticket);
     if (!mtr)
         return false;
     else {
@@ -124,7 +124,7 @@ bool  Order::OrderClose(
    int        slippage,    // slippage
    color      arrow_color  // color
 ) {
-    MqlTradeRequest* mtr = findInOrderMap(_mapOrders, ticket);
+    MqlTradeRequest* mtr = findInOrderMap(ticket);
     if (!mtr)
         return false;
     else {
@@ -208,8 +208,8 @@ void Order::destroyOrders() {
 }
 
 
-MqlTradeRequest* Order::findInOrderMap(MapIntToOrders &mapOrders, int ticket) {
-    return mapOrders.find(ticket)->second;
+MqlTradeRequest* Order::findInOrderMap(int ticket) {
+    return _mapOrders.find(ticket)->second;
 }
 
 } //namespace MQL4
