@@ -18,7 +18,7 @@ double Strategy::Ask() { return datas._Ask; }
 
 void Strategy::setCurrentDataPos(int pos) {
   _CurrentDataPos = pos;
-  datas._Bid = datas._Ask = _SelectedData->data[pos].close;
+  datas._Last = datas._Bid = datas._Ask = _SelectedData->data[pos].close;
   indicator.setData(&datas, _SelectedData, &_CurrentDataPos);
   order.setData(&datas, _SelectedData, &_CurrentDataPos);
 }

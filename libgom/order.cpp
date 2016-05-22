@@ -49,23 +49,25 @@ string  Order::OrderSymbol() {
 double Order::OrderProfit() {
     if (!_SelectedOrder) return 0;
 
-    double profit = 0;
+    _SelectedOrder->profit = 0;
     if (_SelectedOrder->type == ORDER_BUY) {
-        //_SelectedData->data[(*_CurrentDataPos)].close
+        _SelectedOrder->profit = _datas->_Last - _SelectedOrder->price;
     } else if (_SelectedOrder->type == ORDER_SELL) {
-
+        _SelectedOrder->profit = _SelectedOrder->price - _datas->_Last;
     }
-    return profit;
+    return _SelectedOrder->profit;
 }
 
 void Order::closeAll() {
 
     for (auto &p : _Orders) {
         if (p->type == ORDER_BUY) {
-
+            p->profit = _datas->_Last - p->price;
         } else if (p->type == ORDER_SELL) {
-
+            p->profit = p->price - _datas->_Last;
         }
+
+        printf ("profit %.02f\n", p->profit);
     }
 }
 

@@ -137,22 +137,23 @@ typedef struct MqlTradeRequest {
   ENUM_TRADE_REQUEST_ACTIONS action;    /// 交易操作类型
   ulong magic;                          /// EA交易 ID (魔幻数字)
   ulong order;                          /// 订单号
-  string symbol;                        /// 交易的交易品种
+  ulong deviation;                      /// 需求价格最可能的偏差
+  ENUM_ORDER_TYPE type;                 /// 订单类型
+  ENUM_ORDER_TYPE_FILLING type_filling; /// 订单执行类型
+  ENUM_ORDER_TYPE_TIME type_time;       /// 订单执行时间
+  datetime expiration;                  /// 订单终止期 (为 ORDER_TIME_SPECIFIED 类型订单)
+  int arrow_color;                      /// arrow color in chart
+  ENUM_ORDER_STATUS status;             /// the status of theorder
+  datetime sendtime;                    /// sending time
+  datetime modifytime;                  /// modify time
   double volume;                        /// 一手需求的交易量
   double price;                         /// 价格
   double stoplimit;                     /// 订单止损限价点位
   double sl;                            /// 订单止损价位点位
   double tp;                            /// 订单盈利价位点位
-  ulong deviation;                      /// 需求价格最可能的偏差
-  ENUM_ORDER_TYPE type;                 /// 订单类型
-  ENUM_ORDER_TYPE_FILLING type_filling; /// 订单执行类型
-  ENUM_ORDER_TYPE_TIME type_time;       /// 订单执行时间
-  datetime expiration; /// 订单终止期 (为 ORDER_TIME_SPECIFIED 类型订单)
-  string comment;      /// 订单注释
-  int arrow_color;     /// arrow color in chart
-  ENUM_ORDER_STATUS status; /// the status of theorder
-  datetime sendtime;        /// sending time
-  datetime modifytime;      /// modify time
+  double profit;                        /// profit for now
+  string comment;                       /// 订单注释
+  string symbol;                        /// 交易的交易品种
 } MqlTradeRequest;
 
 typedef std::vector<MqlTradeRequest *> VecOrders;
@@ -164,6 +165,7 @@ public:
   ~Order();
 
   VecOrders _Orders;
+  VecOrders _HistoryOrders;
   MapIntToOrders _mapOrders;
   MqlTradeRequest *_SelectedOrder;
   unsigned int _gticket;
