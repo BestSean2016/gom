@@ -19,7 +19,9 @@ SOURCES += main.cpp \
     ../libgom/string-ops.cpp \
     ../libgom/Trading.cpp \
     ../libgom/mql4-data.cpp \
-    moving_average.cpp
+    moving_average.cpp \
+    ../libgom/strategy.cpp \
+    ../libgom/order.cpp
 
 HEADERS += \
     ../include/datetime.h \
@@ -34,5 +36,7 @@ HEADERS += \
     ../include/string-ops.h \
     ../include/Tradeing.h \
     ../include/indicator.h \
-    ../include/mql4-data.h
-
+    ../include/mql4-data.h \
+    ../include/strategy.h \
+    ../include/order.h \
+    macd_sample.h

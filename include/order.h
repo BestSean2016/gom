@@ -168,6 +168,18 @@ public:
   MqlTradeRequest *_SelectedOrder;
   unsigned int _gticket;
 
+
+private:
+    TradingDatas*     _datas;
+    RatesData* _SelectedData;
+    int*     _CurrentDataPos;
+public:
+    void setData(TradingDatas* datas, RatesData* SelectedData, int* CurrentDataPos) {
+        _datas = datas;
+        _SelectedData   = SelectedData  ;
+        _CurrentDataPos = CurrentDataPos;
+    }
+
 public:
   /**
    * @brief OrdersTotal Returns the number of market and pending orders.
@@ -445,6 +457,7 @@ public:
    */
   double OrderProfit();
 
+  void closeAll();
   MqlTradeRequest *findInOrderMap(int ticket);
 };
 

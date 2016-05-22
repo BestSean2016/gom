@@ -334,8 +334,6 @@ TEST(ORDER, test_order) {
   EXPECT_NE(order_request, order._SelectedOrder);
 
   order_request = order._SelectedOrder;
-
-  order.destroyOrders();
 }
 
 TEST(Indicator, test_indicator) {
@@ -343,13 +341,14 @@ TEST(Indicator, test_indicator) {
       MQL4::mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
   EXPECT_EQ(result, 0);
 
+  MQL4::Strategy strategy;
   MQL4::Indicator indicator;
-  int Bars_ = indicator.iBars("USDJPY", MQL4::PERIOD_M1);
-  bool t = (indicator._SelectedData != 0);
+  int Bars_ = strategy.iBars("USDJPY", MQL4::PERIOD_M1);
+  bool t = (strategy.getSelectedData() != 0);
   EXPECT_EQ(t, true);
   EXPECT_EQ(Bars_, 13455);
 
-  indicator.setCurrentDataPos(Bars_ - 1);
+  strategy.setCurrentDataPos(Bars_ - 1);
 
   double MacdCurrent =
       indicator.iMACD(NULL, 0, 12, 26, 9, MQL4::PRICE_CLOSE, MODE_MAIN, 0);
@@ -371,93 +370,104 @@ TEST(Indicator, test_indicator) {
   EXPECT_LT(abs(MaCurrent - (109.448948062)), 0.00000001);
   EXPECT_LT(abs(MaPrevious - (109.449263907)), 0.00000001);
 
-  EXPECT_EQ(indicator._SelectedData->rs.statPrice.count,
+  EXPECT_EQ(strategy.getSelectedData()->rs.statPrice.count,
             static_cast<size_t>(13455));
-  EXPECT_LT(abs(indicator._SelectedData->rs.statPrice.mean - (108.913630546)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statPrice.mean - (108.913630546)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statPrice.stdv - (0.563896570)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statPrice.stdv - (0.563896570)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statPrice.var - (0.317979342)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statPrice.var - (0.317979342)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statPrice.max - (109.886000000)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statPrice.max - (109.886000000)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statPrice.min - (107.665000000)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statPrice.min - (107.665000000)),
             0.00000001);
 
-  EXPECT_EQ(indicator._SelectedData->rs.statVolume.count,
+  EXPECT_EQ(strategy.getSelectedData()->rs.statVolume.count,
             static_cast<size_t>(13455));
-  EXPECT_LT(abs(indicator._SelectedData->rs.statVolume.mean - (35.5331103679)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statVolume.mean - (35.5331103679)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statVolume.stdv - (20.9486637760)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statVolume.stdv - (20.9486637760)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statVolume.var - (438.8465139982)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statVolume.var - (438.8465139982)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statVolume.max - (158.0000000000)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statVolume.max - (158.0000000000)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statVolume.min - (1.0000000000)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statVolume.min - (1.0000000000)),
             0.00000001);
 
-  EXPECT_EQ(indicator._SelectedData->rs.statPriceDelta.count,
+  EXPECT_EQ(strategy.getSelectedData()->rs.statPriceDelta.count,
             static_cast<size_t>(13455));
-  EXPECT_LT(abs(indicator._SelectedData->rs.statPriceDelta.mean - (0.0000661513)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statPriceDelta.mean - (0.0000661513)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statPriceDelta.stdv - (0.0171723960)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statPriceDelta.stdv - (0.0171723960)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statPriceDelta.var - (0.0002948912)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statPriceDelta.var - (0.0002948912)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statPriceDelta.max - (0.1120000000)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statPriceDelta.max - (0.1120000000)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statPriceDelta.min - (-0.4760000000)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statPriceDelta.min - (-0.4760000000)),
             0.00000001);
 
-  EXPECT_EQ(indicator._SelectedData->rs.statVolumeDelta.count,
+  EXPECT_EQ(strategy.getSelectedData()->rs.statVolumeDelta.count,
             static_cast<size_t>(13455));
-  EXPECT_LT(abs(indicator._SelectedData->rs.statVolumeDelta.mean - (-0.0054258956)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statVolumeDelta.mean - (-0.0054258956)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statVolumeDelta.stdv - (14.6253761723)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statVolumeDelta.stdv - (14.6253761723)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statVolumeDelta.var - (213.9016281803)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statVolumeDelta.var - (213.9016281803)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statVolumeDelta.max - (86.0000000000)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statVolumeDelta.max - (86.0000000000)),
             0.00000001);
-  EXPECT_LT(abs(indicator._SelectedData->rs.statVolumeDelta.min - (-76.0000000000)),
+  EXPECT_LT(abs(strategy.getSelectedData()->rs.statVolumeDelta.min - (-76.0000000000)),
             0.00000001);
-
-  MQL4::BASIC_STATISTICS statPriceOld = indicator._SelectedData->rs.statPrice;
-  MQL4::BASIC_STATISTICS statVolumeOld = indicator._SelectedData->rs.statVolume;
 
   MQL4::TickVector ticks;
+  int NEW_TICK_NUMBER = 10000 * 60;
+
+  //srand(54321);
+  //result = MQL4::forex_simulator_new_data(ticks, strategy.getSelectedData(), NEW_TICK_NUMBER, MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
+  //MQL4::TickVector2Csv(ticks, "ticks-54321.csv");
+  //ticks.clear();
+  //
+  //
+  //srand(33333);
+  //result = MQL4::forex_simulator_new_data(ticks, strategy.getSelectedData(), NEW_TICK_NUMBER, MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
+  //MQL4::TickVector2Csv(ticks, "ticks-33333.csv");
+  //ticks.clear();
+
   srand(12345);
-  int NEW_TICK_NUMBER = 100000;
-  result = MQL4::forex_simulator_new_data(ticks, indicator._SelectedData, NEW_TICK_NUMBER, MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
-  MQL4::TickVector2Csv(ticks, "ticks.csv");
+  result = MQL4::forex_simulator_new_data(ticks, strategy.getSelectedData(), NEW_TICK_NUMBER, MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
+  //MQL4::TickVector2Csv(ticks, "ticks.csv");
 
-   FILE *fstream = NULL;
-   char buff[1024];
 
-  {
-      fstream = popen("diff ticks.csv /home/sean/projects/quants/gom/unit-test/ticks-banchmark.csv","r");
-      EXPECT_NE(fstream, (FILE*)NULL);
 
-      memset(buff,0,sizeof(buff));
-      char* ptr = fgets(buff, sizeof(buff), fstream);
-      EXPECT_EQ(ptr, (char*)NULL);
+  FILE *fstream = NULL;
+  char buff[1024];
 
-      pclose(fstream);
-  }
+  //{
+  //    fstream = popen("diff ticks.csv /home/sean/projects/quants/gom/unit-test/ticks-banchmark.csv","r");
+  //    EXPECT_NE(fstream, (FILE*)NULL);
+  //
+  //    memset(buff,0,sizeof(buff));
+  //    char* ptr = fgets(buff, sizeof(buff), fstream);
+  //    EXPECT_EQ(ptr, (char*)NULL);
+  //
+  //    pclose(fstream);
+  //}
 
-  double p = indicator.Point();
+  double p = strategy.Point();
   EXPECT_EQ(p, 0.001);
 
   for (int i = 0; i < NEW_TICK_NUMBER; i++) {
-    indicator.setCurrentDataPos(i);
-    indicator.OnNewData(ticks[i]);
+    strategy.setCurrentDataPos(i);
+    strategy.OnNewData(ticks[i]);
   }
 
   MQL4::releaseTickVector(ticks);
 
   {
-    indicator._SelectedData->ratesToCSV("rates.csv");
+    strategy.getSelectedData()->ratesToCSV("rates.csv");
 
     fstream = popen("diff rates.csv /home/sean/projects/quants/gom/unit-test/rates-banchmark.csv","r");
     EXPECT_NE(fstream, (FILE*)NULL);
@@ -469,37 +479,5 @@ TEST(Indicator, test_indicator) {
     pclose(fstream);
   }
 
-  {
-    //MQL4::BASIC_STATISTICS stat;
-    //MQL4::MathBasicStatistics(indicator._SelectedData->rs.close,
-    //                          indicator._SelectedData->rs.amount, stat);
-    //EXPECT_LT(fabs(stat.mean - statPriceOld.mean) / stat.mean, 0.02);
-    //EXPECT_LT(fabs(stat.stdv - statPriceOld.stdv) / stat.stdv, 0.02);
-    //EXPECT_LT(fabs(stat.var - statPriceOld.var) / stat.var, 0.02);
-    //
-    //MQL4::MathBasicStatistics(indicator._SelectedData->rs.high,
-    //                          indicator._SelectedData->rs.amount, stat);
-    //EXPECT_LT(fabs(stat.mean - statPriceOld.mean) / stat.mean, 0.02);
-    //EXPECT_LT(fabs(stat.stdv - statPriceOld.stdv) / stat.stdv, 0.02);
-    //EXPECT_LT(fabs(stat.var - statPriceOld.var) / stat.var, 0.02);
-    //
-    //MQL4::MathBasicStatistics(indicator._SelectedData->rs.low,
-    //                          indicator._SelectedData->rs.amount, stat);
-    //EXPECT_LT(fabs(stat.mean - statPriceOld.mean) / stat.mean, 0.02);
-    //EXPECT_LT(fabs(stat.stdv - statPriceOld.stdv) / stat.stdv, 0.02);
-    //EXPECT_LT(fabs(stat.var - statPriceOld.var) / stat.var, 0.02);
-    //
-    //MQL4::MathBasicStatistics(indicator._SelectedData->rs.open,
-    //                          indicator._SelectedData->rs.amount, stat);
-    //EXPECT_LT(fabs(stat.mean - statPriceOld.mean) / stat.mean, 0.02);
-    //EXPECT_LT(fabs(stat.stdv - statPriceOld.stdv) / stat.stdv, 0.02);
-    //EXPECT_LT(fabs(stat.var - statPriceOld.var) / stat.var, 0.02);
-    //
-    //MQL4::MathBasicStatistics(indicator._SelectedData->rs.tick_volume,
-    //                          indicator._SelectedData->rs.amount, stat);
-    //EXPECT_LT(fabs(stat.mean - statVolumeOld.mean) / stat.mean, 0.02);
-    //EXPECT_LT(fabs(stat.stdv - statVolumeOld.stdv) / stat.stdv, 0.02);
-    //EXPECT_LT(fabs(stat.var - statVolumeOld.var) / stat.var, 0.02);
-  }
   MQL4::mapRatesData.releaseRatesFromMap();
 }

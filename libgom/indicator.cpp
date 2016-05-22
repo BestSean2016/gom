@@ -5,20 +5,9 @@
 
 namespace MQL4 {
 Indicator::Indicator()
-    : _SelectedSymbol(""), _SelectedData(0), _CurrentDataPos(0) {}
+    : _datas(0), _SelectedData(0), _CurrentDataPos(0) {}
 Indicator::~Indicator() {}
 
-void Indicator::OnNewData(MqlTick &tick) {
-  _SelectedData->addNewTick(tick);
-  //_Bars = static_cast<int>(MQL4::gSelectedData->data.size());
-  //_Bid = tick.bid[0];
-  //_Ask = tick.ask[0];
-}
-
-double Indicator::Bid() { return datas._Bid; }
-double Indicator::Ask() { return datas._Ask; }
-
-void Indicator::setCurrentDataPos(int pos) { _CurrentDataPos = pos; }
 
 static double *getInputData(const RatesData *rates, int applied_price) {
   double *ptr = 0;
@@ -40,17 +29,6 @@ static double *getInputData(const RatesData *rates, int applied_price) {
   return (ptr);
 }
 
-int Indicator::iBars(const char *symbol, // symbol
-                     int timeframe       // timeframe
-                     ) {
-  string s(symbol);
-  _SelectedData = MQL4::mapRatesData.getSymbol(
-      MARKET_FOREX_FURTURES, s, (MQL4::ENUM_TIMEFRAMES)timeframe);
-  if (!_SelectedData)
-    return (0);
-  else
-    return static_cast<int>(_SelectedData->rs.amount);
-}
 
 double Indicator::iMA(const char *symbol, // symbol
                       int timeframe,      // timeframe
@@ -68,7 +46,7 @@ double Indicator::iMA(const char *symbol, // symbol
   }
 
   int outBegIdx, outNBElement;
-  double *outReal = new double[_CurrentDataPos + 1];
+  double *outReal = new double[(*_CurrentDataPos) + 1];
   double *inData = getInputData(rd, applied_price);
 
   //
@@ -97,7 +75,7 @@ double Indicator::iMA(const char *symbol, // symbol
   // to to mapping
   //
   TA_MA(ma_shift,
-        _CurrentDataPos, //(int)rd->rs.amount - 1,
+        (*_CurrentDataPos), //(int)rd->rs.amount - 1,
         inData + ma_shift, ma_period, (TA_MAType)ma_method, &outBegIdx,
         &outNBElement, outReal);
 
@@ -123,16 +101,16 @@ double Indicator::iMACD(const char *symbol,  // symbol
                                          (ENUM_TIMEFRAMES)timeframe);
   }
 
-  double *outMACD = new double[(_CurrentDataPos + 1) * 3];
-  double *outMACDSignal = outMACD + (_CurrentDataPos + 1);
-  double *outMACDHist = outMACDSignal + (_CurrentDataPos + 1);
+  double *outMACD = new double[((*_CurrentDataPos) + 1) * 3];
+  double *outMACDSignal = outMACD + ((*_CurrentDataPos) + 1);
+  double *outMACDHist = outMACDSignal + ((*_CurrentDataPos) + 1);
 
   int outBegIdx, outNBElement;
   double *inData = getInputData(rates, applied_price);
 
   // TA_RetCode code = TA_MACD(0,
   TA_MACD(0,
-          _CurrentDataPos, //(int)rates->rs.amount - 1
+          (*_CurrentDataPos), //(int)rates->rs.amount - 1
           inData, fast_ema_period, slow_ema_period, signal_period, &outBegIdx,
           &outNBElement, outMACD, outMACDSignal, outMACDHist);
 

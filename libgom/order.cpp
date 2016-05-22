@@ -3,7 +3,9 @@
 namespace MQL4 {
 
 Order::Order() : _SelectedOrder(0), _gticket(10000) {}
-Order::~Order() {}
+Order::~Order() {
+    destroyOrders();
+}
 
 int Order::OrdersTotal() {
     return static_cast<int>(_Orders.size());
@@ -46,9 +48,26 @@ string  Order::OrderSymbol() {
 
 double Order::OrderProfit() {
     if (!_SelectedOrder) return 0;
-    return _SelectedOrder->tp;
+
+    double profit = 0;
+    if (_SelectedOrder->type == ORDER_BUY) {
+        //_SelectedData->data[(*_CurrentDataPos)].close
+    } else if (_SelectedOrder->type == ORDER_SELL) {
+
+    }
+    return profit;
 }
 
+void Order::closeAll() {
+
+    for (auto &p : _Orders) {
+        if (p->type == ORDER_BUY) {
+
+        } else if (p->type == ORDER_SELL) {
+
+        }
+    }
+}
 
 
 ulong Order::OrderMagicNumber() {
