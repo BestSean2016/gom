@@ -38,12 +38,20 @@ public:
   virtual void OnTick() {}
 
   void OnNewData(MqlTick &tick);
-
+public:
+  Indicator* getIndicator() { return &indicator; }
+  Order* getOrder() { return &order; }  
   TradingDatas *getTradingData() { return &datas; }
   string &getSelectedSymbol() { return _SelectedSymbol; }
   RatesData *getSelectedData() { return _SelectedData; }
   int *getCurrentDataPos() { return &_CurrentDataPos; }
 
+public:
+  void setSelectedData(RatesData* rates) {
+      _SelectedData = rates;
+      indicator.setData(&datas, _SelectedData, &_CurrentDataPos);
+      order.setData(&datas, _SelectedData, &_CurrentDataPos);
+  }
   void setCurrentDataPos(int pos);
 
   double Bid();

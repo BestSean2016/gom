@@ -328,10 +328,14 @@ TEST(ORDER, test_order) {
   EXPECT_EQ(order_request->deviation, (unsigned long)1);
   EXPECT_EQ(order_request->status, MQL4::ENUM_ORDER_STATUS_CLOSED);
 
-  EXPECT_EQ(order._Orders.size(), (unsigned long)2);
+  EXPECT_EQ(order._Orders.size(), (size_t)0);
+  EXPECT_EQ(order._HistoryOrders.size(), (size_t)2);
+  EXPECT_EQ(order.OrdersTotal(), 0);
+  EXPECT_EQ(order.HistoryTotal(), 1);
+
   t = order.OrderSelect(1, MQL4::SELECT_BY_POS);
-  EXPECT_EQ(t, true);
-  EXPECT_NE(order_request, order._SelectedOrder);
+  EXPECT_EQ(t, false);
+  EXPECT_EQ((order._SelectedOrder == NULL), true);
 
   order_request = order._SelectedOrder;
 }
@@ -342,7 +346,7 @@ TEST(Indicator, test_indicator) {
   EXPECT_EQ(result, 0);
 
   MQL4::Strategy strategy;
-  MQL4::Indicator indicator;
+  MQL4::Indicator* indicator = strategy.getIndicator();
   int Bars_ = strategy.iBars("USDJPY", MQL4::PERIOD_M1);
   bool t = (strategy.getSelectedData() != 0);
   EXPECT_EQ(t, true);
@@ -351,17 +355,17 @@ TEST(Indicator, test_indicator) {
   strategy.setCurrentDataPos(Bars_ - 1);
 
   double MacdCurrent =
-      indicator.iMACD(NULL, 0, 12, 26, 9, MQL4::PRICE_CLOSE, MODE_MAIN, 0);
+      indicator->iMACD(NULL, 0, 12, 26, 9, MQL4::PRICE_CLOSE, MODE_MAIN, 0);
   double MacdPrevious =
-      indicator.iMACD(NULL, 0, 12, 26, 9, MQL4::PRICE_CLOSE, MODE_MAIN, 1);
+      indicator->iMACD(NULL, 0, 12, 26, 9, MQL4::PRICE_CLOSE, MODE_MAIN, 1);
   double SignalCurrent =
-      indicator.iMACD(NULL, 0, 12, 26, 9, MQL4::PRICE_CLOSE, MODE_SIGNAL, 0);
+      indicator->iMACD(NULL, 0, 12, 26, 9, MQL4::PRICE_CLOSE, MODE_SIGNAL, 0);
   double SignalPrevious =
-      indicator.iMACD(NULL, 0, 12, 26, 9, MQL4::PRICE_CLOSE, MODE_SIGNAL, 1);
+      indicator->iMACD(NULL, 0, 12, 26, 9, MQL4::PRICE_CLOSE, MODE_SIGNAL, 1);
   double MaCurrent =
-      indicator.iMA(NULL, MQL4::PERIOD_M1, 26, 0, MQL4::MODE_EMA, MQL4::PRICE_CLOSE, 0);
+      indicator->iMA(NULL, MQL4::PERIOD_M1, 26, 0, MQL4::MODE_EMA, MQL4::PRICE_CLOSE, 0);
   double MaPrevious =
-      indicator.iMA(NULL, MQL4::PERIOD_M1, 26, 0, MQL4::MODE_EMA, MQL4::PRICE_CLOSE, 1);
+      indicator->iMA(NULL, MQL4::PERIOD_M1, 26, 0, MQL4::MODE_EMA, MQL4::PRICE_CLOSE, 1);
 
   EXPECT_LT(abs(MacdCurrent - (0.000828180)), 0.00000001);
   EXPECT_LT(abs(MacdPrevious - (0.000801993)), 0.00000001);
@@ -459,10 +463,8 @@ TEST(Indicator, test_indicator) {
   double p = strategy.Point();
   EXPECT_EQ(p, 0.001);
 
-  for (int i = 0; i < NEW_TICK_NUMBER; i++) {
-    strategy.setCurrentDataPos(i);
+  for (int i = 0; i < NEW_TICK_NUMBER; i++)
     strategy.OnNewData(ticks[i]);
-  }
 
   MQL4::releaseTickVector(ticks);
 

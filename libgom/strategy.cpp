@@ -2,25 +2,29 @@
 
 namespace MQL4 {
 
-Strategy::Strategy() {}
+Strategy::Strategy() {
+  indicator.setData(&datas, _SelectedData, &_CurrentDataPos);
+  order.setData(&datas, _SelectedData, &_CurrentDataPos);
+}
 
 Strategy::~Strategy() {}
 
 void Strategy::OnNewData(MqlTick &tick) {
   _SelectedData->addNewTick(tick);
-  datas._Bars = static_cast<int>(_SelectedData->data.size());
-  datas._Bid = tick.bid[0];
-  datas._Ask = tick.ask[0];
+  datas.Bars = static_cast<int>(_SelectedData->data.size());
+  datas.Bid = tick.bid[0];
+  datas.Ask = tick.ask[0];
+  datas.Last = tick.last;
+  _CurrentDataPos = _SelectedData->data.size() - 1;
 }
 
-double Strategy::Bid() { return datas._Bid; }
-double Strategy::Ask() { return datas._Ask; }
+double Strategy::Bid() { return datas.Bid; }
+double Strategy::Ask() { return datas.Ask; }
 
 void Strategy::setCurrentDataPos(int pos) {
   _CurrentDataPos = pos;
-  datas._Last = datas._Bid = datas._Ask = _SelectedData->data[pos].close;
-  indicator.setData(&datas, _SelectedData, &_CurrentDataPos);
-  order.setData(&datas, _SelectedData, &_CurrentDataPos);
+  datas.Bars = static_cast<int>(_SelectedData->data.size());
+  datas.Bid = datas.Ask = datas.Last = _SelectedData->data[pos].close;
 }
 
 int Strategy::iBars(const char *symbol, // symbol
@@ -33,7 +37,9 @@ int Strategy::iBars(const char *symbol, // symbol
   if (_SelectedData)
     result = static_cast<int>(_SelectedData->rs.amount);
 
-  datas._Bars = result;
+  datas.Bars = result;
+  indicator.setData(&datas, _SelectedData, &_CurrentDataPos);
+  order.setData(&datas, _SelectedData, &_CurrentDataPos);
   return result;
 }
 

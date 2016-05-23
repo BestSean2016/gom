@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "macd_sample.h"
+#include "moving_average.h"
 
 using namespace std;
 
@@ -13,10 +14,17 @@ using namespace std;
 
 int main()
 {
-    MQL4::MacdSample strategy;
+    srand(time(0));
+    MQL4::mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
 
-    strategy.OnInit();
-    int Bars = strategy.iBars("USDJPY", MQL4::PERIOD_M1);
+    MQL4::MacdSample stgMacd;
+    MQL4::MovingAverage stgMa;
+
+    stgMacd.OnInit();
+    stgMa.OnInit();
+
+    int Bars = stgMacd.iBars("USDJPY", MQL4::PERIOD_M1);
+    Bars = stgMa.iBars("USDJPY", MQL4::PERIOD_M1);
 
     // MQL4::TickVector ticks;
     // srand(12345);
@@ -36,13 +44,17 @@ int main()
     //
     // MQL4::releaseTickVector(ticks);
 
-    for (int i = 30; i < Bars; ++i) {
-        strategy.setCurrentDataPos(i);
-        strategy.OnTick();
+    for (int i = 35; i < Bars; ++i) {
+        stgMacd.setCurrentDataPos(i);
+        stgMacd.OnTick();
+        stgMa.setCurrentDataPos(i);
+        stgMa.OnTick();
     }
 
+    stgMa.OnDeinit();
+    stgMacd.OnDeinit();
 
-    strategy.OnDeinit();
+    MQL4::mapRatesData.releaseRatesFromMap();
     return 0;
 }
 

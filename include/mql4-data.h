@@ -225,45 +225,65 @@ extern MapRatesData mapRatesData;
 
 
 typedef struct TradingDatas {
-  int _Digits;       /// Number of digits after decimal point for the current symbol
+public:
+  int Digits;       /// Number of digits after decimal point for the current symbol
                      /// prices
-  int _LastError;    /// The last error code
-  int _Period;       /// Timeframe of the current chart
-  int _RandomSeed;   /// Current status of the generator of pseudo-random integers
-  int _UninitReason; /// Uninitialization reason code
-  int _Bars;         /// Number of bars in the current chart
-  bool _StopFlag;    /// Program stop flag
-  double _Ask;       /// The latest known seller's price (ask price) of the current
+  int LastError;    /// The last error code
+  int Period;       /// Timeframe of the current chart
+  int RandomSeed;   /// Current status of the generator of pseudo-random integers
+  int UninitReason; /// Uninitialization reason code
+  int Bars;         /// Number of bars in the current chart
+  bool StopFlag;    /// Program stop flag
+  double Ask;       /// The latest known seller's price (ask price) of the current
                      /// symbol
-  double _Bid;       /// The latest known buyer's price (offer price, bid price) of
-  double _Last;
-  double _Point;     /// Size of the current symbol point in the quote currency
+  double Bid;       /// The latest known buyer's price (offer price, bid price) of
+  double Last;
+  double Point;     /// Size of the current symbol point in the quote currency
                      /// the current symbol
-  double *_Close;    /// Series array that contains close prices for each bar of
-                     /// the current chart
-  double *_High;     /// Series array that contains the highest prices of each bar
-                     /// of the current chart
-  double *_Low;      /// Series array that contains the lowest prices of each bar of
-                     /// the current chart
-  double *_Open;     /// Series array that contains open prices of each bar of the
-                     /// current chart
-  datetime *_Time;   /// Series array that contains open time of each bar of the
-                     /// current chart
-  double *_Volume;   /// Series array that contains tick volumes of each bar of
-                     /// the current chart
-  string _Symbol;    /// Symbol name of the current chart
-
+  string Symbol;    /// Symbol name of the current chart
+private:
+  RatesData* rd;
+public:
   TradingDatas()
-      : _Digits(0),_LastError(0), _Period(0), _RandomSeed(0),
-        _UninitReason(0), _Bars(0), _StopFlag(0), _Ask(0), _Bid(0),  _Last(0), _Point(0),
-        _Close(0), _High(0), _Low(0), _Open(0), _Time(0), _Volume(0), _Symbol("")  {}
-  ~TradingDatas() {
-    if (_Close)  delete[] _Close;
-    if (_High)   delete[] _High;
-    if (_Low)    delete[] _Low;
-    if (_Open)   delete[] _Open;
-    if (_Time)   delete[] _Time;
-    if (_Volume) delete[] _Volume;
+      : Digits(0),LastError(0), Period(0), RandomSeed(0),
+        UninitReason(0), Bars(0), StopFlag(0), Ask(0), Bid(0),  Last(0), Point(0),
+        Symbol("")  {}
+  ~TradingDatas() {}
+  void setRatesData(RatesData* rd) { this->rd = rd; }
+
+  double Close (int i)    /// Series array that contains close prices for each bar of the current chart
+  {
+      int index = getIndex(i);
+      return (index >= 0) ? rd->data[index].close : 0;
+  }
+  double High  (int i)   /// Series array that contains the highest prices of each bar of the current chart
+    {
+        int index = getIndex(i);
+        return (index >= 0) ? rd->data[index].high : 0;
+    }
+  double Low   (int i)   /// Series array that contains the lowest prices of each bar of the current chart
+  {
+      int index = getIndex(i);
+      return (index >= 0) ? rd->data[index].low : 0;
+  }
+  double Open  (int i)   /// Series array that contains open prices of each bar of the current chart
+  {
+      int index = getIndex(i);
+      return (index >= 0) ? rd->data[index].open : 0;
+  }
+  datetime Time(int i)   /// Series array that contains open time of each bar of the current chart
+  {
+      int index = getIndex(i);
+      return (index >= 0) ? rd->data[index].time : 0;
+  }
+  double Volume(int i)   /// Series array that contains tick volumes of each bar of the current chart
+  {
+      int index = getIndex(i);
+      return (index >= 0) ? rd->data[index].tick_volume : 0;
+  }
+private:
+  int getIndex(int i) {
+      return static_cast<int>(rd->data.size()) - 1 - i;
   }
 } TradingDatas;
 

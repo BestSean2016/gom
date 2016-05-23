@@ -461,6 +461,11 @@ public:
 
   void closeAll();
   MqlTradeRequest *findInOrderMap(int ticket);
+
+
+private:
+  void remove_order_to_history_(ulong orderid);
+
 };
 
 } // namespace MQL4

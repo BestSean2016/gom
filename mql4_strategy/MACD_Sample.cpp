@@ -11,15 +11,11 @@ static double MACDCloseLevel = 2;
 static int MATrendPeriod = 26;
 
 void MacdSample::OnInit(void) {
-  srand(time(0));
-  mapRatesData.get_forex_data("/home/sean/projects/quants/gom/data");
 }
 
 void MacdSample::OnDeinit(void) {
   order.closeAll();
-
   order.destroyOrders();
-  mapRatesData.releaseRatesFromMap();
 }
 
 //+------------------------------------------------------------------+
@@ -39,7 +35,7 @@ void MacdSample::OnTick(void) {
   // TrailingStop) in our case, we check TakeProfit
   // on a chart of less than 100 bars
   //---
-  if (datas._Bars < 100) {
+  if (datas.Bars < 100) {
     Print("bars less than 100");
     return;
   }
@@ -77,15 +73,16 @@ void MacdSample::OnTick(void) {
     //--- check for long position (BUY) possibility
     if (MacdCurrent < 0 && MacdCurrent > SignalCurrent &&
         MacdPrevious < SignalPrevious &&
-        MathAbs(MacdCurrent) > (MACDOpenLevel * datas._Point) &&
+        MathAbs(MacdCurrent) > (MACDOpenLevel * datas.Point) &&
         MaCurrent > MaPrevious) {
 
       ticket =
-          order.OrderSend(Symbol(), OP_BUY, Lots, datas._Ask, 3, 0,
-                    datas._Ask + TakeProfit * datas._Point, "macd sample", 16384, 0, Green);
+          order.OrderSend(Symbol(), OP_BUY, Lots, datas.Ask, 3, 0,
+                    datas.Ask + TakeProfit * datas.Point, "macd sample", 16384, 0, Green);
       if (ticket > 0) {
         if (order.OrderSelect(ticket, SELECT_BY_TICKET, MODE_TRADES))
-          Print("BUY order opened : ", order.OrderOpenPrice());
+          //Print("BUY order opened : ", order.OrderOpenPrice());
+            printf("BUY order opened %d %.03f\n", _CurrentDataPos, order.OrderOpenPrice());
       } else
         Print("Error opening BUY order : ", GetLastError());
 
@@ -95,11 +92,11 @@ void MacdSample::OnTick(void) {
     //--- check for short position (SELL) possibility
     if (MacdCurrent > 0 && MacdCurrent < SignalCurrent &&
         MacdPrevious > SignalPrevious &&
-        MacdCurrent > (MACDOpenLevel * datas._Point) && MaCurrent < MaPrevious) {
+        MacdCurrent > (MACDOpenLevel * datas.Point) && MaCurrent < MaPrevious) {
 
       ticket =
-          order.OrderSend(Symbol(), OP_SELL, Lots, datas._Bid, 3, 0,
-                    datas._Bid - TakeProfit * datas._Point, "macd sample", 16384, 0, Red);
+          order.OrderSend(Symbol(), OP_SELL, Lots, datas.Bid, 3, 0,
+                    datas.Bid - TakeProfit * datas.Point, "macd sample", 16384, 0, Red);
       if (ticket > 0) {
         if (order.OrderSelect(ticket, SELECT_BY_TICKET, MODE_TRADES))
           //Print("SELL order opened : ", OrderOpenPrice());
@@ -125,21 +122,26 @@ void MacdSample::OnTick(void) {
         //--- should it be closed?
         if (MacdCurrent > 0 && MacdCurrent < SignalCurrent &&
             MacdPrevious > SignalPrevious &&
-            MacdCurrent > (MACDCloseLevel * datas._Point)) {
+            MacdCurrent > (MACDCloseLevel * datas.Point)) {
           //--- close order and exit
-          if (!order.OrderClose(order.OrderTicket(), order.OrderLots(), datas._Bid, 3, Violet))
+          if (!order.OrderClose(order.OrderTicket(), order.OrderLots(), datas.Bid, 3, Violet))
             Print("OrderClose error ", GetLastError());
+          else
+            printf("closed %d %.03f\n", _CurrentDataPos, datas.Bid);
           return;
         }
         //--- check for trailing stop
         if (TrailingStop > 0) {
-          if (datas._Bid - order.OrderOpenPrice() > datas._Point * TrailingStop) {
-            if (order.OrderStopLoss() < datas._Bid - datas._Point * TrailingStop) {
+          if (datas.Bid - order.OrderOpenPrice() > datas.Point * TrailingStop) {
+            if (order.OrderStopLoss() < datas.Bid - datas.Point * TrailingStop) {
               //--- modify order and exit
               if (!order.OrderModify(order.OrderTicket(), order.OrderOpenPrice(),
-                               datas._Bid - datas._Point * TrailingStop, order.OrderTakeProfit(),
+                               datas.Bid - datas.Point * TrailingStop, order.OrderTakeProfit(),
                                0, Green))
                 Print("OrderModify error ", GetLastError());
+              else
+                printf("modify %d %.03f\n", _CurrentDataPos, datas.Bid);
+
               return;
             }
           }
@@ -148,23 +150,28 @@ void MacdSample::OnTick(void) {
         //--- should it be closed?
         if (MacdCurrent < 0 && MacdCurrent > SignalCurrent &&
             MacdPrevious < SignalPrevious &&
-            MathAbs(MacdCurrent) > (MACDCloseLevel * datas._Point)) {
+            MathAbs(MacdCurrent) > (MACDCloseLevel * datas.Point)) {
           //--- close order and exit
-          if (!order.OrderClose(order.OrderTicket(), order.OrderLots(), datas._Ask, 3, Violet))
+          if (!order.OrderClose(order.OrderTicket(), order.OrderLots(), datas.Ask, 3, Violet))
             Print("OrderClose error ", GetLastError());
+          else
+            printf("closed %d %.03f\n", _CurrentDataPos, datas.Bid);
           return;
         }
 
         //--- check for trailing stop
         if (TrailingStop > 0) {
-          if ((order.OrderOpenPrice() - datas._Ask) > (datas._Point * TrailingStop)) {
-            if ((order.OrderStopLoss() > (datas._Ask + datas._Point * TrailingStop)) ||
+          if ((order.OrderOpenPrice() - datas.Ask) > (datas.Point * TrailingStop)) {
+            if ((order.OrderStopLoss() > (datas.Ask + datas.Point * TrailingStop)) ||
                 (order.OrderStopLoss() == 0)) {
               //--- modify order and exit
               if (!order.OrderModify(order.OrderTicket(), order.OrderOpenPrice(),
-                               datas._Ask + datas._Point * TrailingStop, order.OrderTakeProfit(),
+                               datas.Ask + datas.Point * TrailingStop, order.OrderTakeProfit(),
                                0, Red))
                 Print("OrderModify error ", GetLastError());
+              else
+                printf("modify %d %.03f\n", _CurrentDataPos, datas.Ask);
+
               return;
             }
           }

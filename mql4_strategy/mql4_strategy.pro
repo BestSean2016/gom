@@ -39,4 +39,5 @@ HEADERS += \
     ../include/mql4-data.h \
     ../include/strategy.h \
     ../include/order.h \
-    macd_sample.h
+    macd_sample.h \
+    moving_average.h

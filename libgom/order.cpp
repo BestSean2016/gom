@@ -2,6 +2,15 @@
 
 namespace MQL4 {
 
+static double getProfit(int order_type, double open_price, double close_price) {
+    if (order_type == ORDER_BUY) {
+        return close_price - open_price;
+    } else if (order_type == ORDER_SELL) {
+        return open_price - close_price;
+    }
+    return (0);
+}
+
 Order::Order() : _SelectedOrder(0), _gticket(10000) {}
 Order::~Order() {
     destroyOrders();
@@ -51,9 +60,9 @@ double Order::OrderProfit() {
 
     _SelectedOrder->profit = 0;
     if (_SelectedOrder->type == ORDER_BUY) {
-        _SelectedOrder->profit = _datas->_Last - _SelectedOrder->price;
+        _SelectedOrder->profit = _datas->Last - _SelectedOrder->price;
     } else if (_SelectedOrder->type == ORDER_SELL) {
-        _SelectedOrder->profit = _SelectedOrder->price - _datas->_Last;
+        _SelectedOrder->profit = _SelectedOrder->price - _datas->Last;
     }
     return _SelectedOrder->profit;
 }
@@ -62,9 +71,9 @@ void Order::closeAll() {
 
     for (auto &p : _Orders) {
         if (p->type == ORDER_BUY) {
-            p->profit = _datas->_Last - p->price;
+            p->profit = _datas->Last - p->price;
         } else if (p->type == ORDER_SELL) {
-            p->profit = p->price - _datas->_Last;
+            p->profit = p->price - _datas->Last;
         }
 
         printf ("profit %.02f\n", p->profit);
@@ -78,16 +87,11 @@ ulong Order::OrderMagicNumber() {
 }
 
 int Order::HistoryTotal() {
-    return OrdersHistoryTotal();
+    return static_cast<int>(_HistoryOrders.size() / 2);
 }
 
 int Order::OrdersHistoryTotal() {
-    int closed = 0;
-    for (auto& p : _Orders)
-        if (p->status == ENUM_ORDER_STATUS_CLOSED)
-            ++closed;
-
-    return closed;
+    return static_cast<int>(_HistoryOrders.size() / 2);
 }
 
 int  Order::OrderTicket() {
@@ -149,6 +153,9 @@ bool  Order::OrderClose(
     if (!mtr)
         return false;
     else {
+        if (_SelectedOrder == mtr)
+            _SelectedOrder = 0;
+
         MqlTradeRequest* mtrClose = new MqlTradeRequest;
         mtrClose->order = _gticket++;
         mtrClose->magic = mtr->order;
@@ -161,7 +168,9 @@ bool  Order::OrderClose(
         mtr->status = ENUM_ORDER_STATUS_CLOSED;
 
         mtrClose->action       = mtr->action;               /// 交易操作类型
-        mtrClose->magic        = mtr->magic;                /// EA交易 ID (魔幻数字)
+        //SEAN SEAN SEAN --- set the close-magic to open-order-id
+        //mtrClose->magic        = mtr->magic;                /// EA交易 ID (魔幻数字)
+        mtrClose->magic        = mtr->order;                /// EA交易 ID (魔幻数字)
         mtrClose->symbol       = mtr->symbol;               /// 交易的交易品种
         mtrClose->stoplimit    = mtr->stoplimit;            /// 订单止损限价点位
         mtrClose->sl           = mtr->sl;                   /// 订单止损价位点位
@@ -172,10 +181,27 @@ bool  Order::OrderClose(
         mtrClose->expiration   = mtr->expiration  ;         /// 订单终止期 (为 ORDER_TIME_SPECIFIED 类型订单)
         mtrClose->comment      = mtr->comment     ;         /// 订单注释
         mtrClose->sendtime     = mtr->sendtime    ;         /// sending time
+        mtrClose->profit = mtr->profit = getProfit(mtr->type, mtr->price, price);
 
-        _Orders.push_back(mtrClose);
+        //_Orders.push_back(mtrClose);
         _mapOrders.insert(std::pair<int, MqlTradeRequest*>(mtrClose->order, mtrClose));
+
+        _HistoryOrders.push_back(mtr);
+        _HistoryOrders.push_back(mtrClose);
+        remove_order_to_history_(mtr->order);
+        //remove_order_to_history_(mtrClose->order);
+
         return true;
+    }
+}
+
+void Order::remove_order_to_history_(ulong orderid) {
+    for (size_t i = 0; i < _Orders.size(); ++i) {
+        if (_Orders[i]->order == orderid) {
+            VecOrders::iterator it = _Orders.begin() + i;
+            _Orders.erase(it);
+            break;
+        }
     }
 }
 
@@ -219,13 +245,10 @@ int  Order::OrderSend(
 
 void Order::destroyOrders() {
     for (auto &p : _mapOrders)
-        delete (p.second);
-
+        delete p.second;
     _mapOrders.clear();
-    //for (size_t i = 0; i < _Orders.size(); ++i) {
-    //    delete _Orders[i];
-    //}
     _Orders .clear();
+    _HistoryOrders .clear();
 }
 
 
