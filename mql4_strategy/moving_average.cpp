@@ -71,7 +71,7 @@ void MovingAverage::CheckForOpen() {
   double ma;
   //int res;
   //--- go trading only for first tiks of new bar
-  if (datas.Volume(0) > 1) return;
+  ////if (datas.Volume(0) > 1) return;
   //--- get Moving Average
   ma = indicator.iMA(NULL, 0, MovingPeriod, MovingShift, MODE_SMA, PRICE_CLOSE, 0);
   //--- sell conditions
@@ -96,7 +96,7 @@ void MovingAverage::CheckForOpen() {
 void MovingAverage::CheckForClose() {
   double ma;
   //--- go trading only for first tiks of new bar
-  if (datas.Volume(0) > 1) return;
+  ////if (datas.Volume(0) > 1) return;
   //--- get Moving Average
   ma = indicator.iMA(NULL, 0, MovingPeriod, MovingShift, MODE_SMA, PRICE_CLOSE, 0);
   //---
@@ -141,7 +141,8 @@ void MovingAverage::OnInit() {
 }
 
 void MovingAverage::OnDeinit() {
-
+    order.closeAll();
+    order.destroyOrders();
 }
 
 }//namespace MQL4

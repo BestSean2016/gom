@@ -52,56 +52,48 @@ TEST(read_forex_csv, DataAdaptor) {
   r.tick_volume = 86;
   r.time = MQL4::ForexStringToTime(
       "2016.04.08,16:22,108.600,108.601,108.551,108.555,86");
-  bool t = (rd.data[0] == r);
-  EXPECT_EQ(t, true);
+  EXPECT_EQ((rd.data[0] == r), true);
 
   // line 1000
   // 2016.04.11,11:01,108.134,108.139,108.123,108.130,34
   r.open = 108.134, r.high = 108.139, r.low = 108.123, r.close = 108.130,
   r.tick_volume = 34;
   r.time = MQL4::ForexStringToTime("2016.04.11,11:01");
-  t = (rd.data[1000 - 1] == r);
-  EXPECT_EQ(t, true);
+  EXPECT_EQ((rd.data[1000 - 1] == r), true);
 
   // line 3000
   // 2016.04.12,20:27,108.580,108.592,108.569,108.591,35
   r.open = 108.580, r.high = 108.592, r.low = 108.569, r.close = 108.591,
   r.tick_volume = 35;
   r.time = MQL4::ForexStringToTime("2016.04.12,20:27");
-  t = (rd.data[3000 - 1] == r);
-  EXPECT_EQ(t, true);
+  EXPECT_EQ((rd.data[3000 - 1] == r), true);
 
   // line 6000
   // 2016.04.14,22:43,109.378,109.396,109.377,109.395,13
   r.open = 109.378, r.high = 109.396, r.low = 109.377, r.close = 109.395,
   r.tick_volume = 13;
   r.time = MQL4::ForexStringToTime("2016.04.14,22:43");
-  t = (rd.data[6000 - 1] == r);
-  EXPECT_EQ(t, true);
+  EXPECT_EQ((rd.data[6000 - 1] == r), true);
 
   // line 12000
   // 2016.04.21,05:01,109.674,109.679,109.673,109.673,17
   r.open = 109.674, r.high = 109.679, r.low = 109.673, r.close = 109.673,
   r.tick_volume = 17;
   r.time = MQL4::ForexStringToTime("2016.04.21,05:01");
-  t = (rd.data[12000 - 1] == r);
-  EXPECT_EQ(t, true);
+  EXPECT_EQ((rd.data[12000 - 1] == r), true);
 
   // line 13455
   // 2016.04.22,05:18,109.452,109.452,109.444,109.445,13
   r.open = 109.452, r.high = 109.452, r.low = 109.444, r.close = 109.445,
   r.tick_volume = 13;
   r.time = MQL4::ForexStringToTime("2016.04.22,05:18");
-  t = (rd.data[13455 - 1] == r);
-  EXPECT_EQ(t, true);
+  EXPECT_EQ((rd.data[13455 - 1] == r), true);
 
   MQL4::TickData td;
   rd.reates_to_tick(td);
   EXPECT_EQ(rd.data.size(), td.data.size());
-  for (size_t i = 0; i < rd.data.size(); ++i) {
-    t = (rd.data[i] == td.data[i]);
-    EXPECT_EQ(t, true);
-  }
+  for (size_t i = 0; i < rd.data.size(); ++i)
+    EXPECT_EQ((rd.data[i] == td.data[i]), true);
 
   rd.releaseData();
   EXPECT_EQ((rd.rs.time == 0), true);
@@ -149,7 +141,7 @@ TEST(get_forex_data_from_path, get_forex_data) {
   std::string symbol_name("USDJPY");
   MQL4::RatesData *rd = MQL4::mapRatesData.getSymbol(
       MQL4::MARKET_FOREX_FURTURES, symbol_name, MQL4::PERIOD_M1);
-  EXPECT_EQ((rd != 0), true);
+  EXPECT_NE((void*)rd, (void*)0);
   EXPECT_EQ(rd->symbol.market, MQL4::MARKET_FOREX_FURTURES);
   EXPECT_EQ(rd->symbol.symbol_name, string("USDJPY"));
   EXPECT_EQ(rd->symbol.period, MQL4::ENUM_TIMEFRAMES::PERIOD_M1);
@@ -168,7 +160,7 @@ TEST(TA_MA, test_ta_lib_for_ma) {
   std::string symbol_name("USDJPY");
   MQL4::RatesData *rd = MQL4::mapRatesData.getSymbol(
       MQL4::MARKET_FOREX_FURTURES, symbol_name, MQL4::PERIOD_M1);
-  EXPECT_EQ((rd != 0), true);
+  EXPECT_NE((void*)rd, (void*)0);
 
   double *outTrimaReal = new double[rd->rs.size * 4];
   double *outSmaReal = outTrimaReal + rd->rs.size;
@@ -236,7 +228,7 @@ TEST(TA_MACD, test_ta_lib_for_macd) {
   std::string symbol_name("USDJPY");
   MQL4::RatesData *rd = MQL4::mapRatesData.getSymbol(
       MQL4::MARKET_FOREX_FURTURES, symbol_name, MQL4::PERIOD_M1);
-  EXPECT_EQ((rd != 0), true);
+  EXPECT_NE((void*)rd, (void*)0);
 
   double *outMACD_1 = new double[rd->rs.size * 3];
   double *outMACDSignal_1 = outMACD_1 + rd->rs.size;
@@ -302,12 +294,10 @@ TEST(ORDER, test_order) {
   EXPECT_EQ(order_request->deviation, (unsigned long)1);
   EXPECT_EQ(order_request->status, MQL4::ENUM_ORDER_STATUS_OPENED);
 
-  bool t = order.OrderSelect(0, MQL4::SELECT_BY_POS);
-  EXPECT_EQ(t, true);
+  EXPECT_EQ(order.OrderSelect(0, MQL4::SELECT_BY_POS), true);
   EXPECT_EQ(order_request, order._SelectedOrder);
 
-  t = order.OrderModify(ticket, 12.8, 8.0, 20.0, 0, clrNONE);
-  EXPECT_EQ(t, true);
+  EXPECT_EQ(order.OrderModify(ticket, 12.8, 8.0, 20.0, 0, clrNONE), true);
   EXPECT_EQ(order_request->type, MQL4::ORDER_BUY);
   EXPECT_EQ(order_request->price, 12.8);
   EXPECT_EQ(order_request->sl, 8.0);
@@ -317,8 +307,7 @@ TEST(ORDER, test_order) {
   EXPECT_EQ(order_request->deviation, (unsigned long)1);
   EXPECT_EQ(order_request->status, MQL4::ENUM_ORDER_STATUS_MODIFIED);
 
-  t = order.OrderClose(ticket, 20, 14.8, 1, clrNONE);
-  EXPECT_EQ(t, true);
+  EXPECT_EQ(order.OrderClose(ticket, 20, 14.8, 1, clrNONE), true);
   EXPECT_EQ(order_request->type, MQL4::ORDER_BUY);
   EXPECT_EQ(order_request->price, 12.8);
   EXPECT_EQ(order_request->sl, 8.0);
@@ -333,8 +322,7 @@ TEST(ORDER, test_order) {
   EXPECT_EQ(order.OrdersTotal(), 0);
   EXPECT_EQ(order.HistoryTotal(), 1);
 
-  t = order.OrderSelect(1, MQL4::SELECT_BY_POS);
-  EXPECT_EQ(t, false);
+  EXPECT_EQ(order.OrderSelect(1, MQL4::SELECT_BY_POS), false);
   EXPECT_EQ((order._SelectedOrder == NULL), true);
 
   order_request = order._SelectedOrder;
@@ -348,8 +336,7 @@ TEST(Indicator, test_indicator) {
   MQL4::Strategy strategy;
   MQL4::Indicator* indicator = strategy.getIndicator();
   int Bars_ = strategy.iBars("USDJPY", MQL4::PERIOD_M1);
-  bool t = (strategy.getSelectedData() != 0);
-  EXPECT_EQ(t, true);
+  EXPECT_EQ((strategy.getSelectedData() != 0), true);
   EXPECT_EQ(Bars_, 13455);
 
   strategy.setCurrentDataPos(Bars_ - 1);

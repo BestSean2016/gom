@@ -5,6 +5,7 @@ namespace MQL4 {
 Strategy::Strategy() {
   indicator.setData(&datas, _SelectedData, &_CurrentDataPos);
   order.setData(&datas, _SelectedData, &_CurrentDataPos);
+  datas.setRatesData(_SelectedData);
 }
 
 Strategy::~Strategy() {}
@@ -40,6 +41,7 @@ int Strategy::iBars(const char *symbol, // symbol
   datas.Bars = result;
   indicator.setData(&datas, _SelectedData, &_CurrentDataPos);
   order.setData(&datas, _SelectedData, &_CurrentDataPos);
+  datas.setRatesData(_SelectedData);
   return result;
 }
 

@@ -45,8 +45,8 @@ int main()
     // MQL4::releaseTickVector(ticks);
 
     for (int i = 35; i < Bars; ++i) {
-        stgMacd.setCurrentDataPos(i);
-        stgMacd.OnTick();
+        //stgMacd.setCurrentDataPos(i);
+        //stgMacd.OnTick();
         stgMa.setCurrentDataPos(i);
         stgMa.OnTick();
     }
